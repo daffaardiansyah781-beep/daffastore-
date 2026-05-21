@@ -5,290 +5,400 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DaffaStore Admin</title>
 <style>
-:root{
-  --bg:#07090f;--s1:#0d1017;--s2:#131820;--s3:#181f2e;--s4:#1c2438;
-  --b1:#1e2538;--b2:#252d42;--b3:#2d3655;
-  --cyan:#00d4ff;--purple:#7c3aed;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--pink:#ec4899;--blue:#3b82f6;
-  --t1:#e2e8f0;--t2:#94a3b8;--t3:#475569;
-  --r:10px;--r2:14px;--r3:18px;
-}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--s1)}
-::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;min-height:100vh}
 
 /* LOGIN */
-.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px;background-image:radial-gradient(ellipse at 70% 20%,rgba(124,58,237,.1) 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(0,212,255,.07) 0%,transparent 60%)}
-.login-box{background:var(--s2);border:1px solid var(--b1);border-radius:24px;padding:40px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.5)}
-.login-logo{font-size:1.6rem;font-weight:900;margin-bottom:4px}.login-logo b{color:var(--cyan)}
-.login-sub{font-size:.82rem;color:var(--t3);margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:6px}
-.login-fl{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;text-align:left}
-.login-fl label{font-size:.78rem;color:var(--t2);font-weight:600}
-.login-fl input{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:12px 14px;color:var(--t1);font-size:.9rem;outline:none;transition:.2s;width:100%}
-.login-fl input:focus{border-color:var(--cyan)}
-.login-btn{width:100%;padding:13px;border:none;border-radius:var(--r2);background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;margin-top:6px;transition:.2s;letter-spacing:.3px}
-.login-btn:hover{opacity:.9;transform:translateY(-1px)}
-.login-hint{font-size:.73rem;color:var(--t3);margin-top:14px}
-.login-hint b{color:var(--t2)}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#131820;border:1px solid #1e2538;border-radius:20px;padding:32px;width:100%;max-width:360px;text-align:center}
+.login-logo{font-size:1.4rem;font-weight:900;margin-bottom:4px}.login-logo span{color:#00d4ff}
+.login-sub{font-size:.78rem;color:#475569;margin-bottom:24px}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;text-align:left}
+.fl label{font-size:.75rem;color:#94a3b8;font-weight:600}
+.fl input{background:#181f2e;border:1px solid #252d42;border-radius:8px;padding:11px 13px;color:#e2e8f0;font-size:.9rem;outline:none;width:100%}
+.login-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;font-size:.9rem;font-weight:800;cursor:pointer;margin-top:4px}
+.login-hint{font-size:.72rem;color:#475569;margin-top:10px}
 
-/* APP SHELL */
-.app{display:none;min-height:100vh;flex-direction:column}
-.app.show{display:flex}
-.shell{display:grid;grid-template-columns:210px 1fr;flex:1;overflow:hidden;height:calc(100vh - 54px)}
+/* APP */
+.app{display:none}
+.app.show{display:block}
 
-/* TOPBAR */
-.topbar{height:54px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
-.tl{display:flex;align-items:center;gap:10px}
-.tl-logo{font-size:1.1rem;font-weight:900}.tl-logo b{color:var(--cyan)}
-.tl-badge{font-size:.65rem;font-weight:700;background:rgba(239,68,68,.15);color:var(--red);padding:2px 8px;border-radius:100px;border:1px solid rgba(239,68,68,.2)}
-.tr{display:flex;align-items:center;gap:10px}
-.tb-notif{position:relative;cursor:pointer;padding:6px;border-radius:8px;transition:.2s}
-.tb-notif:hover{background:var(--s3)}
-.notif-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--s1)}
-.tb-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 10px;border-radius:var(--r);background:var(--s3);border:1px solid var(--b1);transition:.2s;font-size:.82rem}
-.tb-user:hover{border-color:var(--b2)}
-.avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--purple),var(--cyan));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800}
-.tb-btn{background:transparent;border:1px solid var(--b1);border-radius:8px;color:var(--t2);padding:6px 12px;font-size:.75rem;cursor:pointer;transition:.2s}
-.tb-btn:hover{border-color:var(--red);color:var(--red)}
+/* NAV */
+nav{background:#0d1017;border-bottom:1px solid #1e2538;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1rem;font-weight:900}.logo span{color:#00d4ff}
+.nav-right{display:flex;align-items:center;gap:10px}
+.admin-badge{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.2);padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:700}
+.logout-btn{background:transparent;border:1px solid #1e2538;border-radius:8px;color:#94a3b8;padding:6px 12px;font-size:.75rem;cursor:pointer}
 
-/* SIDEBAR */
-.sidebar{background:var(--s1);border-right:1px solid var(--b1);overflow-y:auto;padding:12px 0;display:flex;flex-direction:column}
-.sb-sec{margin-bottom:2px}
-.sb-lbl{font-size:.62rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;padding:10px 14px 4px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:.15s;border-left:2px solid transparent;font-size:.82rem;color:var(--t2);position:relative}
-.sb-item:hover{background:rgba(255,255,255,.03);color:var(--t1)}
-.sb-item.active{background:rgba(0,212,255,.06);border-left-color:var(--cyan);color:var(--cyan)}
-.sb-item .si{font-size:1rem;width:20px;text-align:center}
-.sb-badge{margin-left:auto;font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:100px}
-.sb-divider{height:1px;background:var(--b1);margin:8px 12px}
-.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--b1)}
-.sb-footer-txt{font-size:.7rem;color:var(--t3)}
+/* TABS */
+.tabs{display:flex;overflow-x:auto;background:#0d1017;border-bottom:1px solid #1e2538;padding:0 16px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;font-size:.78rem;font-weight:600;color:#475569;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s}
+.tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
 
-/* MAIN */
-.main-content{overflow-y:auto;flex:1;padding:24px}
+/* PAGES */
+.page{display:none;padding:20px}.page.active{display:block}
 
-/* PAGE */
-.page{display:none}.page.active{display:block}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#131820;border:1px solid #1e2538;border-radius:14px;padding:16px}
+.stat-val{font-size:1.4rem;font-weight:900;line-height:1;margin-bottom:5px}
+.stat-lbl{font-size:.7rem;color:#475569;text-transform:uppercase;letter-spacing:.4px}
+.stat-trend{font-size:.7rem;margin-top:5px;font-weight:600;color:#10b981}
 
-/* STATS GRID */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:20px;position:relative;overflow:hidden;cursor:default;transition:.2s}
-.stat-card:hover{border-color:var(--b2);transform:translateY(-2px)}
-.stat-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:.06}
-.sc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
-.sc-trend{font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:100px}
-.sc-trend.up{background:rgba(16,185,129,.12);color:var(--green)}
-.sc-trend.dn{background:rgba(239,68,68,.12);color:var(--red)}
-.sc-val{font-size:1.7rem;font-weight:900;line-height:1;margin-bottom:5px;font-variant-numeric:tabular-nums}
-.sc-lbl{font-size:.75rem;color:var(--t3);font-weight:500}
-.sc-sub{font-size:.72rem;color:var(--t3);margin-top:6px}
-
-/* CHART */
-.chart-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:24px}
-.chart-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:20px}
-.cc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.cc-title{font-size:.9rem;font-weight:700}
-.cc-sub{font-size:.72rem;color:var(--t3);margin-top:2px}
-.chart-bar-wrap{display:flex;align-items:flex-end;gap:8px;height:140px}
-.bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
-.bar{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(to top,var(--purple),var(--cyan));min-height:4px;transition:.4s;position:relative;cursor:pointer}
-.bar:hover::after{content:attr(data-val);position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:2px 7px;font-size:.7rem;white-space:nowrap;color:var(--t1)}
-.bar-lbl{font-size:.65rem;color:var(--t3);text-align:center}
-.donut-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
-svg.donut{transform:rotate(-90deg)}
-.donut-legend{display:flex;flex-direction:column;gap:8px;margin-top:16px;width:100%}
-.dl-item{display:flex;align-items:center;gap:8px;font-size:.75rem}
-.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.dl-name{flex:1;color:var(--t2)}
-.dl-pct{font-weight:700}
+/* CARDS */
+.card{background:#131820;border:1px solid #1e2538;border-radius:14px;margin-bottom:14px;overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1e2538}
+.card-title{font-size:.875rem;font-weight:700}
+.card-body{padding:16px}
 
 /* TABLE */
-.section-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:20px;overflow:hidden}
-.sc-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:10px}
-.sc-header-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
-.sc-header-right{display:flex;gap:8px;align-items:center}
-.s-input{background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:7px 12px;color:var(--t1);font-size:.78rem;outline:none;width:180px;transition:.2s}
-.s-input:focus{border-color:var(--cyan)}
-.s-select{background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:7px 10px;color:var(--t1);font-size:.78rem;outline:none;cursor:pointer}
-.s-select option{background:var(--s1)}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;padding:10px 16px;font-size:.7rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--b1)}
-td{padding:12px 16px;font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.015)}
-.t-game{display:flex;align-items:center;gap:10px}
-.t-icon{font-size:1.4rem;width:32px;text-align:center}
-.t-gname{font-weight:600;font-size:.85rem}
-.t-gsub{font-size:.7rem;color:var(--t3)}
-.t-id{font-family:monospace;font-size:.75rem;color:var(--t2)}
-.status{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:100px}
-.st-success{background:rgba(16,185,129,.12);color:var(--green)}
-.st-pending{background:rgba(245,158,11,.12);color:var(--gold)}
-.st-failed{background:rgba(239,68,68,.12);color:var(--red)}
-.st-processing{background:rgba(59,130,246,.12);color:var(--blue)}
-.action-btn{background:var(--s3);border:1px solid var(--b2);border-radius:7px;padding:5px 10px;font-size:.72rem;color:var(--t2);cursor:pointer;transition:.2s}
-.action-btn:hover{border-color:var(--cyan);color:var(--cyan)}
-.action-btn.red:hover{border-color:var(--red);color:var(--red)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:500px}
+th{text-align:left;padding:9px 12px;background:rgba(255,255,255,.02);color:#475569;font-size:.68rem;font-weight:700;text-transform:uppercase;border-bottom:1px solid #1e2538}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.01)}
+.status{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:100px}
+.st-ok{background:rgba(16,185,129,.12);color:#10b981}
+.st-pend{background:rgba(245,158,11,.12);color:#f59e0b}
+.st-fail{background:rgba(239,68,68,.12);color:#ef4444}
 
-/* PAGINATION */
-.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--b1);font-size:.78rem;color:var(--t3)}
-.pg-btns{display:flex;gap:4px}
-.pg-btn{padding:5px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t2);cursor:pointer;font-size:.75rem;transition:.2s}
-.pg-btn:hover,.pg-btn.active{border-color:var(--cyan);color:var(--cyan)}
-
-/* GAME CARDS GRID */
-.game-mgmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:20px}
-.gm-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:16px;text-align:center;transition:.2s;position:relative}
-.gm-card:hover{border-color:var(--b3)}
-.gm-toggle{position:absolute;top:10px;right:10px}
-.toggle{width:36px;height:20px;background:var(--b2);border-radius:100px;cursor:pointer;position:relative;transition:.2s}
-.toggle.on{background:var(--green)}
-.toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s}
+/* GAME LIST */
+.game-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.game-item{background:#181f2e;border:1px solid #252d42;border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px}
+.gi-icon{font-size:1.6rem}
+.gi-name{font-size:.82rem;font-weight:700}
+.gi-cat{font-size:.7rem;color:#94a3b8}
+.toggle{width:36px;height:20px;background:#1e2538;border-radius:100px;cursor:pointer;position:relative;transition:.3s;margin-left:auto;flex-shrink:0}
+.toggle.on{background:#10b981}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s}
 .toggle.on::after{left:19px}
-.gm-icon{font-size:2.2rem;margin-bottom:8px}
-.gm-name{font-weight:700;font-size:.875rem;margin-bottom:4px}
-.gm-cat{font-size:.7rem;color:var(--t3)}
-.gm-stats{display:flex;justify-content:center;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)}
-.gm-stat-val{font-size:.875rem;font-weight:800;color:var(--cyan)}
-.gm-stat-lbl{font-size:.65rem;color:var(--t3)}
-.gm-actions{display:flex;gap:6px;margin-top:10px;justify-content:center}
-
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.show{display:flex}
-.modal{background:var(--s2);border:1px solid var(--b1);border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
-.modal-head{padding:20px 24px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-size:1rem;font-weight:800}
-.modal-close{background:var(--s3);border:none;color:var(--t2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;transition:.2s}
-.modal-close:hover{color:var(--red)}
-.modal-body{padding:24px}
-.m-fl{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.m-fl label{font-size:.78rem;color:var(--t2);font-weight:600}
-.m-fl input,.m-fl select,.m-fl textarea{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:11px 13px;color:var(--t1);font-size:.88rem;outline:none;transition:.2s;width:100%}
-.m-fl input:focus,.m-fl select:focus,.m-fl textarea:focus{border-color:var(--cyan)}
-.m-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.modal-foot{padding:16px 24px;border-top:1px solid var(--b1);display:flex;gap:10px;justify-content:flex-end}
-.m-btn{padding:10px 20px;border-radius:var(--r);border:none;font-size:.85rem;font-weight:700;cursor:pointer;transition:.2s}
-.m-btn-ghost{background:var(--s3);color:var(--t2);border:1px solid var(--b2)}
-.m-btn-ghost:hover{color:var(--t1)}
-.m-btn-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff}
-.m-btn-primary:hover{opacity:.9}
-.m-btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.2)}
-
-/* WIDGETS ROW */
-.widgets-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
-.widget{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:18px}
-.widget-title{font-size:.82rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.activity-list{display:flex;flex-direction:column;gap:10px}
-.act-item{display:flex;align-items:center;gap:10px}
-.act-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
-.act-info{flex:1}
-.act-title{font-size:.8rem;font-weight:600}
-.act-sub{font-size:.7rem;color:var(--t3);margin-top:1px}
-.act-time{font-size:.68rem;color:var(--t3)}
-.top-game-list{display:flex;flex-direction:column;gap:8px}
-.tg-item{display:flex;align-items:center;gap:10px}
-.tg-rank{width:22px;font-size:.75rem;font-weight:800;color:var(--t3);text-align:center}
-.tg-icon{font-size:1.3rem}
-.tg-name{flex:1;font-size:.82rem;font-weight:600}
-.tg-bar-wrap{width:100px;height:6px;background:var(--s3);border-radius:3px;overflow:hidden}
-.tg-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--purple),var(--cyan))}
-.tg-pct{font-size:.72rem;font-weight:700;color:var(--t2);width:35px;text-align:right}
 
 /* COUPON */
-.coupon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:20px}
-.cp-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:16px;position:relative;overflow:hidden}
-.cp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.cp-card.active::before{background:linear-gradient(90deg,var(--purple),var(--cyan))}
-.cp-card.inactive::before{background:var(--b2)}
-.cp-code{font-family:monospace;font-size:1.1rem;font-weight:900;color:var(--cyan);letter-spacing:2px;margin-bottom:6px}
-.cp-desc{font-size:.75rem;color:var(--t2);margin-bottom:10px;line-height:1.5}
-.cp-meta{display:flex;gap:8px;flex-wrap:wrap}
-.cp-tag{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:100px}
-.cp-used{font-size:.72rem;color:var(--t3);margin-top:8px}
-.cp-prog{height:4px;background:var(--b1);border-radius:2px;margin-top:6px;overflow:hidden}
-.cp-prog-bar{height:100%;border-radius:2px;background:var(--gold)}
-.cp-actions{display:flex;gap:6px;margin-top:10px}
+.coupon-list{display:flex;flex-direction:column;gap:10px}
+.coupon-item{background:#181f2e;border:1px solid #252d42;border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.coupon-code{font-family:monospace;font-size:1rem;font-weight:900;color:#00d4ff;letter-spacing:2px}
+.coupon-desc{font-size:.75rem;color:#94a3b8;margin-top:2px}
+.coupon-disc{background:rgba(0,212,255,.1);color:#00d4ff;border:1px solid rgba(0,212,255,.2);border-radius:100px;padding:3px 10px;font-size:.72rem;font-weight:700;margin-left:auto}
 
 /* SETTING */
-.setting-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.setting-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:20px}
-.setting-title{font-size:.875rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.s-fl{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.s-fl label{font-size:.78rem;color:var(--t2);font-weight:600}
-.s-fl input,.s-fl select{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:10px 13px;color:var(--t1);font-size:.875rem;outline:none;transition:.2s;width:100%}
-.s-fl input:focus{border-color:var(--cyan)}
+.setting-list{display:flex;flex-direction:column;gap:12px}
+.setting-item{background:#181f2e;border:1px solid #252d42;border-radius:12px;padding:16px}
+.setting-label{font-size:.82rem;font-weight:700;margin-bottom:10px}
+.setting-input{width:100%;background:#131820;border:1px solid #1e2538;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:.85rem;outline:none;margin-bottom:8px}
+.save-btn{padding:9px 18px;border:none;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer}
+
+/* BTN */
+.btn{padding:7px 14px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s;border:none}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff}
+.btn-outline{background:transparent;border:1px solid #1e2538;color:#94a3b8}
+.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444}
 
 /* TOAST */
-.toast-wrap{position:fixed;top:64px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
-.toast{background:var(--s1);border:1px solid var(--b1);border-radius:100px;padding:9px 18px;font-size:.78rem;font-weight:500;animation:slideIn .3s ease;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.toast.ok{border-color:var(--green);color:var(--green)}
-.toast.err{border-color:var(--red);color:var(--red)}
-.toast.info{border-color:var(--cyan);color:var(--cyan)}
-
-/* MISC */
-.btn{padding:8px 16px;border-radius:var(--r);border:none;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;box-shadow:0 2px 12px rgba(0,212,255,.15)}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
-.btn-outline{background:transparent;border:1px solid var(--b2);color:var(--t2)}
-.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
-.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red)}
-.btn-danger:hover{background:rgba(239,68,68,.2)}
-.empty{text-align:center;padding:40px;color:var(--t3);font-size:.85rem}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.page-title{font-size:1.2rem;font-weight:900}
-.page-sub{font-size:.78rem;color:var(--t3);margin-top:3px}
-@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
-@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-@media(max-width:640px){.shell{grid-template-columns:1fr}.sidebar{display:none}.chart-row,.widgets-row,.setting-grid{grid-template-columns:1fr}}
+.toast-w{position:fixed;bottom:20px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:#0d1017;border:1px solid #10b981;border-radius:100px;padding:8px 18px;font-size:.75rem;font-weight:600;color:#10b981}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
+<div class="login-wrap" id="loginWrap">
   <div class="login-box">
-    <div class="login-logo">Daffa<b>Store</b></div>
-    <div class="login-sub">🛡️ Admin Panel · Akses Terbatas</div>
-    <div class="login-fl"><label>Username</label><input type="text" id="loginUser" placeholder="admin" value="admin"></div>
-    <div class="login-fl"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" value="admin123"></div>
+    <div class="login-logo">Daffa<span>Store</span></div>
+    <div class="login-sub">🛡️ Admin Panel</div>
+    <div class="fl"><label>Username</label><input type="text" id="loginUser" placeholder="admin" value="admin"></div>
+    <div class="fl"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" value="admin123"></div>
     <button class="login-btn" onclick="doLogin()">Masuk ke Dashboard</button>
-    <div class="login-hint">Demo: <b>admin</b> / <b>admin123</b></div>
+    <div class="login-hint">Demo: admin / admin123</div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast-wrap" id="toastWrap"></div>
-
 <!-- APP -->
-<div class="app" id="app">
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="tl">
-      <div class="tl-logo">Daffa<b>Store</b></div>
-      <div class="tl-badge">ADMIN</div>
+<div class="app" id="appWrap">
+  <nav>
+    <div class="logo">Daffa<span>Store</span> <span class="admin-badge">ADMIN</span></div>
+    <div class="nav-right">
+      <button class="logout-btn" onclick="doLogout()">Keluar</button>
     </div>
-    <div class="tr">
-      <div class="tb-notif" onclick="toast('3 order perlu perhatian','info')">🔔<div class="notif-dot"></div></div>
-      <div class="tb-user"><div class="avatar">A</div>Administrator</div>
-      <button class="tb-btn" onclick="doLogout()">Keluar</button>
+  </nav>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('dashboard',this)">📊 Dashboard</div>
+    <div class="tab" onclick="showTab('orders',this)">📋 Order</div>
+    <div class="tab" onclick="showTab('games',this)">🎮 Game</div>
+    <div class="tab" onclick="showTab('coupons',this)">🎁 Kupon</div>
+    <div class="tab" onclick="showTab('settings',this)">⚙️ Setting</div>
+  </div>
+
+  <div class="toast-w" id="toastW"></div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="pg-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" style="color:#00d4ff">Rp 89 Jt</div><div class="stat-lbl">Total Pendapatan</div><div class="stat-trend">↑ 12% hari ini</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:#7c3aed">85</div><div class="stat-lbl">Total Order</div><div class="stat-trend">↑ 8 order baru</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:#10b981">79</div><div class="stat-lbl">Order Sukses</div><div class="stat-trend">↑ 93% sukses</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:#f59e0b">3</div><div class="stat-lbl">Pending</div><div class="stat-trend" style="color:#f59e0b">⚠️ Perlu cek</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">🕐 Order Terbaru</div><button class="btn btn-outline" onclick="showTab('orders',null)">Lihat Semua</button></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Order ID</th><th>Game</th><th>Item</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="recentOrders"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">🏆 Game Terpopuler</div></div>
+      <div class="card-body" id="topGames"></div>
     </div>
   </div>
 
-  <div class="shell">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="sb-sec">
-        <div class="sb-lbl">Menu Utama</div>
-        <div class="sb-item active" onclick="nav('dashboard',this)"><span class="si">📊</span>Dashboard</div>
-        <div class="sb-item" onclick="nav('orders',this)"><span class="si">📋</span>Semua Order<span class="sb-badge" style="background:rgba(239,68,68,.15);color:var(--red)">3</span></div>
-        <div class="sb-item" onclick="nav('games',this)"><span class="si">🎮</span>Kelola Game</div>
-        <div class="sb-item" onclick="nav('coupons',this)"><span class="si">🎁</span>Kupon Promo</div>
+  <!-- ORDERS -->
+  <div class="page" id="pg-orders">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📋 Semua Order</div>
+        <button class="btn btn-primary" onclick="exportCSV()">⬇️ Export</button>
       </div>
-      <div class="sb-divider"></div>
-      <div class="sb-sec">
-        <div class="sb-lbl">Laporan</div>
-        <div class="sb-item" onclick="nav('revenue',this)"><span class="si">💰</span>Pendapatan</div>
-        <div class="sb-item" onclick="nav('users',this)"><span class="
+      <div style="padding:12px 16px">
+        <select id="orderFilter" onchange="renderOrders()" style="background:#181f2e;border:1px solid #252d42;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:.78rem;outline:none;width:100%">
+          <option value="all">Semua Status</option>
+          <option value="SUCCESS">Sukses</option>
+          <option value="PENDING">Pending</option>
+          <option value="FAILED">Gagal</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Order ID</th><th>Game</th><th>User ID</th><th>Item</th><th>Total</th><th>Bayar</th><th>Status</th></tr></thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAMES -->
+  <div class="page" id="pg-games">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🎮 Kelola Game</div></div>
+      <div class="card-body">
+        <div class="game-list" id="gameList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUPONS -->
+  <div class="page" id="pg-coupons">
+    <div class="card">
+      <div class="card-head"><div class="card-title">🎁 Kupon Aktif</div><button class="btn btn-primary" onclick="toast('Fitur tambah kupon tersedia di versi pro')">+ Tambah</button></div>
+      <div class="card-body">
+        <div class="coupon-list" id="couponList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="pg-settings">
+    <div class="setting-list">
+      <div class="setting-item">
+        <div class="setting-label">🏪 Nama Toko</div>
+        <input class="setting-input" value="DaffaStore">
+        <button class="save-btn" onclick="toast('Pengaturan disimpan ✅')">Simpan</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-label">💳 Midtrans Server Key</div>
+        <input class="setting-input" type="password" placeholder="SB-Mid-server-xxxx">
+        <button class="save-btn" onclick="toast('API Key disimpan ✅')">Simpan</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-label">🎮 Supplier API Key</div>
+        <input class="setting-input" type="password" placeholder="API Key Digiflazz">
+        <button class="save-btn" onclick="toast('Supplier Key disimpan ✅')">Simpan</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-label">📱 WhatsApp CS</div>
+        <input class="setting-input" placeholder="+62 812 3456 7890" value="+62 812 3456 7890">
+        <button class="save-btn" onclick="toast('Nomor WA disimpan ✅')">Simpan</button>
+      </div>
+      <div class="setting-item">
+        <div class="setting-label">🔐 Ganti Password Admin</div>
+        <input class="setting-input" type="password" placeholder="Password baru">
+        <input class="setting-input" type="password" placeholder="Konfirmasi password">
+        <button class="save-btn" onclick="toast('Password diperbarui ✅')">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// DATA
+const ORDERS = [];
+const GAMES = [
+  {id:'ml',name:'Mobile Legends',icon:'⚔️',cat:'MOBA',active:true},
+  {id:'ff',name:'Free Fire',icon:'🔥',cat:'Battle Royale',active:true},
+  {id:'pubg',name:'PUBG Mobile',icon:'🪖',cat:'Battle Royale',active:true},
+  {id:'gi',name:'Genshin Impact',icon:'🌟',cat:'RPG',active:true},
+  {id:'hsr',name:'Honkai Star Rail',icon:'🚂',cat:'RPG',active:true},
+  {id:'cod',name:'Call of Duty',icon:'🎯',cat:'FPS',active:false},
+  {id:'val',name:'Valorant',icon:'🎮',cat:'FPS',active:true},
+  {id:'rblx',name:'Roblox',icon:'🟥',cat:'Lainnya',active:true},
+];
+const COUPONS = [
+  {code:'DAFFAML10',desc:'Diskon 10% Diamond ML',disc:'10%',active:true},
+  {code:'NEWUSER20',desc:'Diskon 20% user baru',disc:'20%',active:true},
+  {code:'TOPUP5K',desc:'Potongan Rp 5.000',disc:'Rp 5rb',active:true},
+  {code:'FF15OFF',desc:'Diskon 15% Free Fire',disc:'15%',active:false},
+  {code:'RAMADAN25',desc:'Promo spesial semua game',disc:'25%',active:true},
+];
+
+// Generate fake orders
+const games=['ml','ff','pubg','gi'];
+const gnames={'ml':'Mobile Legends','ff':'Free Fire','pubg':'PUBG Mobile','gi':'Genshin'};
+const icons={'ml':'⚔️','ff':'🔥','pubg':'🪖','gi':'🌟'};
+const items={'ml':'Diamond','ff':'Diamond','pubg':'UC','gi':'Crystal'};
+const pays=['QRIS','GoPay','OVO','BCA'];
+const stats=['SUCCESS','SUCCESS','SUCCESS','PENDING','FAILED'];
+const amts=[86,172,257,355,514,660,720];
+const prices=[19000,38000,57000,69000,111000,162000,139000];
+for(let i=0;i<30;i++){
+  const g=games[Math.floor(Math.random()*games.length)];
+  const idx=Math.floor(Math.random()*amts.length);
+  const d=new Date(Date.now()-Math.random()*7*86400000);
+  ORDERS.push({
+    id:'DS-'+Math.random().toString(36).slice(2,8).toUpperCase(),
+    game:g, gname:gnames[g], icon:icons[g],
+    uid:Math.floor(10000000+Math.random()*90000000).toString(),
+    item:amts[idx]+' '+items[g],
+    price:prices[idx],
+    pay:pays[Math.floor(Math.random()*pays.length)],
+    status:stats[Math.floor(Math.random()*stats.length)],
+    date:d.toLocaleString('id-ID')
+  });
+}
+
+// AUTH
+function doLogin(){
+  const u=document.getElementById('loginUser').value;
+  const p=document.getElementById('loginPass').value;
+  if(u==='admin'&&p==='admin123'){
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('appWrap').classList.add('show');
+    renderAll();
+    toast('Selamat datang, Admin! 👋');
+  } else {
+    toast('Username atau password salah!');
+  }
+}
+function doLogout(){
+  document.getElementById('appWrap').classList.remove('show');
+  document.getElementById('loginWrap').style.display='flex';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// TABS
+function showTab(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+// RENDER
+function renderAll(){
+  renderRecentOrders();
+  renderTopGames();
+  renderOrders();
+  renderGames();
+  renderCoupons();
+}
+
+function renderRecentOrders(){
+  document.getElementById('recentOrders').innerHTML=ORDERS.slice(0,5).map(o=>`
+    <tr>
+      <td style="font-family:monospace;font-size:.7rem;color:#00d4ff">${o.id}</td>
+      <td>${o.icon} ${o.gname}</td>
+      <td>${o.item}</td>
+      <td style="color:#00d4ff;font-weight:700">Rp ${o.price.toLocaleString('id-ID')}</td>
+      <td><span class="status ${o.status==='SUCCESS'?'st-ok':o.status==='PENDING'?'st-pend':'st-fail'}">${o.status}</span></td>
+    </tr>`).join('');
+}
+
+function renderTopGames(){
+  const top=[
+    {g:'Mobile Legends',icon:'⚔️',orders:1240,pct:100},
+    {g:'Free Fire',icon:'🔥',orders:872,pct:70},
+    {g:'PUBG Mobile',icon:'🪖',orders:560,pct:45},
+    {g:'Genshin Impact',icon:'🌟',orders:410,pct:33},
+  ];
+  document.getElementById('topGames').innerHTML=top.map(t=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="font-size:1.3rem">${t.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:4px">${t.g}</div>
+        <div style="height:6px;background:#1e2538;border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${t.pct}%;background:linear-gradient(90deg,#7c3aed,#00d4ff);border-radius:3px"></div>
+        </div>
+      </div>
+      <div style="font-size:.78rem;font-weight:700;color:#00d4ff">${t.orders}</div>
+    </div>`).join('');
+}
+
+function renderOrders(){
+  const f=document.getElementById('orderFilter')?.value||'all';
+  const data=f==='all'?ORDERS:ORDERS.filter(o=>o.status===f);
+  document.getElementById('ordersTable').innerHTML=data.map(o=>`
+    <tr>
+      <td style="font-family:monospace;font-size:.7rem;color:#00d4ff">${o.id}</td>
+      <td>${o.icon} ${o.gname}</td>
+      <td style="font-size:.75rem;color:#94a3b8">${o.uid}</td>
+      <td>${o.item}</td>
+      <td style="color:#00d4ff;font-weight:700">Rp ${o.price.toLocaleString('id-ID')}</td>
+      <td style="font-size:.75rem">${o.pay}</td>
+      <td><span class="status ${o.status==='SUCCESS'?'st-ok':o.status==='PENDING'?'st-pend':'st-fail'}">${o.status}</span></td>
+    </tr>`).join('');
+}
+
+function renderGames(){
+  document.getElementById('gameList').innerHTML=GAMES.map(g=>`
+    <div class="game-item">
+      <div class="gi-icon">${g.icon}</div>
+      <div><div class="gi-name">${g.name}</div><div class="gi-cat">${g.cat}</div></div>
+      <div class="toggle ${g.active?'on':''}" onclick="toggleGame('${g.id}',this)"></div>
+    </div>`).join('');
+}
+
+function toggleGame(id,el){
+  const g=GAMES.find(x=>x.id===id);
+  if(g){g.active=!g.active;el.classList.toggle('on');toast(g.name+' '+(g.active?'diaktifkan':'dinonaktifkan'));}
+}
+
+function renderCoupons(){
+  document.getElementById('couponList').innerHTML=COUPONS.map(c=>`
+    <div class="coupon-item">
+      <div>
+        <div class="coupon-code">${c.code}</div>
+        <div class="coupon-desc">${c.desc}</div>
+      </div>
+      <div class="coupon-disc">${c.disc}</div>
+      <span class="status ${c.active?'st-ok':'st-fail'}">${c.active?'Aktif':'Nonaktif'}</span>
+    </div>`).join('');
+}
+
+function exportCSV(){
+  toast('Export CSV berhasil ⬇️');
+}
+
+function toast(msg){
+  const w=document.getElementById('toastW');
+  const d=document.createElement('div');
+  d.className='toast';d.textContent=msg;
+  w.appendChild(d);
+  setTimeout(()=>d.remove(),3000);
+}
+</script>
+</body>
+  </html>
