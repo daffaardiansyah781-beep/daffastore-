@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DaffaStore — Notification Center</title>
+<style>
+:root{
+  --bg:#07090f;--s1:#0d1017;--s2:#131820;--s3:#181f2e;--s4:#1c2438;
+  --b1:#1e2538;--b2:#252d42;--b3:#2d3655;
+  --cyan:#00d4ff;--purple:#7c3aed;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--pink:#ec4899;
+  --wa:#25d366;--email:#ea4335;
+  --t1:#e2e8f0;--t2:#94a3b8;--t3:#475569;
+  --kw:#c084fc;--str:#86efac;--num:#fda4af;--fn:#93c5fd;--cmt:#475569;--prop:#fcd34d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* TOP BAR */
+.topbar{height:52px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;position:sticky;top:0;z-index:100}
+.tb-logo{font-size:1rem;font-weight:900;margin-right:4px}.tb-logo b{color:var(--cyan)}
+.tb-badge{font-size:.65rem;font-weight:700;padding:2px 9px;border-radius:100px;background:rgba(37,211,102,.12);color:var(--wa);border:1px solid rgba(37,211,102,.2)}
+.tb-right{margin-left:auto;display:flex;gap:8px}
+.tb-btn{padding:6px 14px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s;border:none}
+.tb-outline{background:transparent;border:1px solid var(--b1);color:var(--t2)}
+.tb-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+.tb-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff}
+.tb-primary:hover{opacity:.9}
+
+/* TABS NAV */
+.tabs-nav{background:var(--s2);border-bottom:1px solid var(--b1);display:flex;padding:0 20px;overflow-x:auto;flex-shrink:0}
+.tabs-nav::-webkit-scrollbar{display:none}
+.tn{padding:12px 16px;font-size:.8rem;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tn:hover{color:var(--t2)}
+.tn.active{color:var(--t1);border-bottom-color:var(--cyan)}
+
+/* MAIN */
+.content{flex:1;overflow-y:auto;padding:24px clamp(16px,4vw,40px)}
+.page{display:none}.page.active{display:block}
+
+/* SECTION TITLE */
+.pg-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.pg-title{font-size:1.15rem;font-weight:900}
+.pg-sub{font-size:.78rem;color:var(--t3);margin-top:3px}
+
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.sc{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px;transition:.2s}
+.sc:hover{border-color:var(--b2)}
+.sc-v{font-size:1.6rem;font-weight:900;line-height:1;margin-bottom:5px}
+.sc-l{font-size:.72rem;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.sc-t{font-size:.7rem;margin-top:6px;font-weight:600}
+.sc-t.up{color:var(--green)}.sc-t.dn{color:var(--red)}
+
+/* PHONE MOCKUP */
+.phone-wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.phone{width:280px;flex-shrink:0;background:#000;border-radius:36px;padding:12px;box-shadow:0 24px 60px rgba(0,0,0,.6);border:2px solid #1a1a1a}
+.phone-screen{background:#e5ddd5;border-radius:26px;overflow:hidden;min-height:520px;display:flex;flex-direction:column}
+.phone-header{background:#075e54;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.ph-back{color:rgba(255,255,255,.7);font-size:.8rem;cursor:pointer}
+.ph-avatar{width:34px;height:34px;background:var(--wa);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.ph-info{flex:1}
+.ph-name{font-size:.85rem;font-weight:700;color:#fff}
+.ph-status{font-size:.68rem;color:rgba(255,255,255,.7)}
+.phone-body{flex:1;padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.wa-msg{max-width:85%;border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.6;position:relative;word-break:break-word}
+.wa-msg.recv{background:#fff;border-radius:12px 12px 12px 0;align-self:flex-start;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.wa-msg.sent{background:#dcf8c6;border-radius:12px 12px 0 12px;align-self:flex-end;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.wa-time{font-size:.62rem;color:rgba(0,0,0,.45);text-align:right;margin-top:4px}
+.wa-bold{font-weight:700}
+.wa-green{color:#075e54}
+.wa-line{height:1px;background:rgba(0,0,0,.08);margin:6px 0}
+.wa-emoji{font-size:1.1rem}
+.phone-input{background:#f0f0f0;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.ph-inp{flex:1;background:#fff;border-radius:100px;padding:7px 14px;font-size:.75rem;color:#333;border:none;outline:none}
+.ph-send{width:34px;height:34px;background:var(--wa);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem}
+
+/* CODE */
+.code-block{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.cb-head{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--b1);background:rgba(255,255,255,.02)}
+.cb-lang{font-size:.7rem;font-weight:700;color:var(--t3);display:flex;align-items:center;gap:7px}
+.cb-lang span{width:9px;height:9px;border-radius:50%}
+.cb-copy{background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t2);padding:3px 11px;font-size:.7rem;font-weight:700;cursor:pointer;transition:.2s}
+.cb-copy:hover{border-color:var(--cyan);color:var(--cyan)}
+pre{padding:16px 18px;overflow-x:auto;font-family:'Cascadia Code','Fira Code',monospace;font-size:.76rem;line-height:1.7}
+.kw{color:var(--kw)}.str{color:var(--str)}.num{color:var(--num)}.fn{color:var(--fn)}.cmt{color:var(--cmt);font-style:italic}.prop{color:var(--prop)}.cls{color:#fb923c}
+
+/* EMAIL PREVIEW */
+.email-frame{background:#f4f6fb;border-radius:12px;padding:16px;overflow:auto;max-height:600px}
+.email-client-bar{background:#fff;border-radius:8px 8px 0 0;padding:10px 14px;border-bottom:2px solid #e8eaf0;display:flex;align-items:center;gap:8px;font-size:.75rem;color:#555}
+.ecb-dot{width:10px;height:10px;border-radius:50%}
+.email-body{background:#fff;border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+
+/* LOG TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:9px 14px;font-size:.68rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--b1)}
+td{padding:10px 14px;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.01)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px}
+.b-ok{background:rgba(16,185,129,.12);color:var(--green)}
+.b-fail{background:rgba(239,68,68,.12);color:var(--red)}
+.b-pend{background:rgba(245,158,11,.12);color:var(--gold)}
+.b-wa{background:rgba(37,211,102,.12);color:var(--wa)}
+.b-em{background:rgba(234,67,53,.12);color:var(--email)}
+.b-sms{background:rgba(59,130,246,.12);color:#60a5fa}
+
+/* PROVIDER CARDS */
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:20px}
+.pv-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;transition:.2s;cursor:pointer}
+.pv-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.pv-card.selected{border-color:var(--wa)}
+.pv-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pv-logo{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.pv-name{font-weight:800;font-size:.9rem}
+.pv-url{font-size:.7rem;color:var(--t3)}
+.pv-desc{font-size:.78rem;color:var(--t2);line-height:1.6}
+.pv-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pv-tag{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:100px}
+
+/* CONFIG FORM */
+.cfg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:600px){.cfg-row{grid-template-columns:1fr}}
+.fl{display:flex;flex-direction:column;gap:5px}
+.fl label{font-size:.75rem;color:var(--t2);font-weight:600}
+.fl input,.fl select,.fl textarea{background:var(--s3);border:1px solid var(--b2);border-radius:9px;padding:10px 12px;color:var(--t1);font-size:.85rem;outline:none;transition:.2s;width:100%}
+.fl input:focus,.fl select:focus,.fl textarea:focus{border-color:var(--cyan)}
+.fl textarea{resize:vertical;min-height:80px}
+.fl select option{background:var(--s1)}
+
+/* TEMPLATE SELECTOR */
+.tmpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.tmpl-card{background:var(--s3);border:1px solid var(--b2);border-radius:12px;padding:14px;cursor:pointer;transition:.2s}
+.tmpl-card:hover,.tmpl-card.active{border-color:var(--cyan);background:rgba(0,212,255,.05)}
+.tmpl-icon{font-size:1.4rem;margin-bottom:8px}
+.tmpl-name{font-size:.82rem;font-weight:700;margin-bottom:3px}
+.tmpl-desc{font-size:.7rem;color:var(--t3)}
+
+/* ALERT */
+.alert{border-radius:10px;padding:11px 15px;font-size:.8rem;line-height:1.6;display:flex;gap:9px;margin-bottom:14px}
+.al-info{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);color:var(--cyan)}
+.al-warn{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);color:var(--gold)}
+.al-ok{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);color:var(--green)}
+.al-icon{flex-shrink:0;margin-top:1px}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:9px;border:none;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;box-shadow:0 3px 14px rgba(0,212,255,.15)}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-wa{background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.2);color:var(--wa)}
+.btn-wa:hover{background:rgba(37,211,102,.2)}
+.btn-email{background:rgba(234,67,53,.1);border:1px solid rgba(234,67,53,.2);color:var(--email)}
+.btn-email:hover{background:rgba(234,67,53,.18)}
+.btn-outline{background:transparent;border:1px solid var(--b2);color:var(--t2)}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* GRID 2 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.g2{grid-template-columns:1fr}}
+
+/* TEST PANEL */
+.test-panel{background:var(--s3);border:1px solid var(--b2);border-radius:12px;padding:18px}
+.test-title{font-size:.85rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.send-sim{display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--s2);border-radius:10px;border:1px solid var(--b1);margin-bottom:8px}
+.ss-icon{font-size:1.2rem}
+.ss-info{flex:1}
+.ss-title{font-size:.8rem;font-weight:600}
+.ss-sub{font-size:.7rem;color:var(--t3)}
+.ss-btn{padding:6px 14px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;border:none;transition:.2s}
+
+/* TOAST */
+.toast-w{position:fixed;bottom:20px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--s1);border:1px solid var(--b1);border-radius:100px;padding:8px 18px;font-size:.75rem;font-weight:600;animation:slideR .3s ease;box-shadow:0 6px 20px rgba(0,0,0,.4);white-space:nowrap}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.info{border-color:var(--cyan);color:var(--cyan)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.wa{border-color:var(--wa);color:var(--wa)}
+@keyframes slideR{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-logo">Daffa<b>Store</b></div>
+  <div class="tb-badge">🔔 Notification Center</div>
+  <div class="tb-right">
+    <button class="tb-btn tb-outline" onclick="showPage('log')">📊 View Logs</button>
+    <button class="tb-btn tb-primary" onclick="sendTestAll()">🚀 Test Kirim Semua</button>
+  </div>
+</div>
+
+<div class="tabs-nav">
+  <div class="tn active" onclick="showPage('overview',this)">📊 Overview</div>
+  <div class="tn" onclick="showPage('wa',this)">💬 WhatsApp Bot</div>
+  <div class="tn" onclick="showPage('email',this)">📧 Email Templates</div>
+  <div class="tn" onclick="showPage('code',this)">⚙️ Integration Code</div>
+  <div class="tn" onclick="showPage('log',this)">📋 Log Notifikasi</div>
+  <div class="tn" onclick="showPage('settings',this)">🔧 Konfigurasi</div>
+</div>
+
+<div class="toast-w" id="toastW"></div>
+<div class="content">
+
+<!-- ══ OVERVIEW ══ -->
+<div class="page active" id="page-overview">
+  <div class="pg-head">
+    <div><div class="pg-title">📊 Notification Overview</div><div class="pg-sub">Statistik pengiriman notifikasi hari ini</div></div>
+    <button class="btn btn-primary" onclick="showPage('wa');document.querySelectorAll('.tn')[1].classList.add('active')">+ Buat Template</button>
+  </div>
+
+  <div class="stat-row">
+    <div class="sc"><div class="sc-v" style="color:var(--wa)">1.240</div><div class="sc-l">WA Terkirim</div><div class="sc-t up">↑ 12% hari ini</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--email)">987</div><div class="sc-l">Email Terkirim</div><div class="sc-t up">↑ 8% hari ini</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--green)">98.4%</div><div class="sc-l">Delivery Rate</div><div class="sc-t up">↑ 0.2%</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--red)">21</div><div class="sc-l">Gagal Kirim</div><div class="sc-t dn">↑ 3 error baru</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--cyan)">4.2s</div><div class="sc-l">Avg Delivery</div><div class="sc-t up">↓ 0.8s lebih cepat</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--gold)">72%</div><div class="sc-l">WA Open Rate</div><div class="sc-t up">↑ 5% dari kemarin</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">💬 WhatsApp Channel</div><span class="badge b-ok">● Terhubung</span></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--s3);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:2rem">📱</div>
+          <div>
+            <div style="font-weight:700;font-size:.9rem">Fonnte API</div>
+            <div style="font-size:.75rem;color:var(--t2);margin-top:2px">+62 812-XXXX-XXXX · Sandbox</div>
+            <div style="font-size:.7rem;color:var(--green);margin-top:3px">● Aktif · 1.240 pesan hari ini</div>
+          </div>
+        </div>
+        <div class="tmpl-grid" style="grid-template-columns:1fr 1fr;margin-bottom:0">
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--wa)">5</div>
+            <div style="font-size:.7rem;color:var(--t3)">Template Aktif</div>
+          </div>
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--cyan)">Rp 0</div>
+            <div style="font-size:.7rem;color:var(--t3)">Biaya Bulan Ini</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">📧 Email Channel</div><span class="badge b-ok">● Terhubung</span></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--s3);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:2rem">✉️</div>
+          <div>
+            <div style="font-weight:700;font-size:.9rem">Gmail SMTP</div>
+            <div style="font-size:.75rem;color:var(--t2);margin-top:2px">noreply@daffastore.com</div>
+            <div style="font-size:.7rem;color:var(--green);margin-top:3px">● Aktif · 987 email hari ini</div>
+          </div>
+        </div>
+        <div class="tmpl-grid" style="grid-template-columns:1fr 1fr;margin-bottom:0">
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--email)">4</div>
+            <div style="font-size:.7rem;color:var(--t3)">Template Aktif</div>
+          </div>
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--cyan)">Gratis</div>
+            <div style="font-size:.7rem;color:var(--t3)">Gmail SMTP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">📡 Alur Notifikasi Otomatis</div></div>
+    <div class="card-body">
+      <div style="display:flex;gap:0;overflow-x:auto;padding-bottom:8px">
+        <div style="display:flex;align-items:center;gap:0;min-width:max-content">
+          ${[
+            ['💳','Pembayaran\nBerhasil','var(--green)'],
+            ['→','',''],
+            ['🔔','Webhook\nDiterima','var(--cyan)'],
+            ['→','',''],
+            ['⚙️','Proses\nTop Up','var(--purple)'],
+            ['→','',''],
+            ['💬','Kirim WA\nOtomatis','var(--wa)'],
+            ['+','',''],
+            ['📧','Kirim\nEmail','var(--email)'],
+          ].map(([i,l,c]) => l ? `
+            <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;text-align:center;min-width:90px">
+              <div style="font-size:1.3rem;margin-bottom:5px">${i}</div>
+              <div style="font-size:.68rem;font-weight:700;color:${c};white-space:pre-line;line-height:1.3">${l}</div>
+            </div>` :
+            `<div style="color:var(--t3);padding:0 8px;font-size:1.1rem;flex-shrink:0">${i}</div>`
+          ).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">⚡ Aktivitas Terbaru</div></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Waktu</th><th>Order ID</th><th>Tipe</th><th>Tujuan</th><th>Template</th><th>Status</th></tr></thead>
+        <tbody id="recentLog"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WHATSAPP ══ -->
+<div class="page" id="page-wa">
+  <div class="pg-head">
+    <div><div class="pg-title">💬 WhatsApp Bot & Templates</div><div class="pg-sub">Kelola pesan WA otomatis menggunakan Fonnte API</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-wa" onclick="sendTestWA()">📤 Test Kirim WA</button>
+    </div>
+  </div>
+
+  <div class="alert al-info"><div class="al-icon">💡</div><div>WA Bot menggunakan <b>Fonnte API</b> (fonnte.com) — gratis 1.000 pesan/bulan. Kamu bisa ganti ke <b>WablaS</b>, <b>Zenziva</b>, atau <b>Wappin</b> sesuai kebutuhan.</div></div>
+
+  <!-- TEMPLATE SELECTOR -->
+  <div class="tmpl-grid" id="waTmplSelector">
+    <div class="tmpl-card active" onclick="selectWATmpl('success',this)"><div class="tmpl-icon">✅</div><div class="tmpl-name">Top Up Sukses</div><div class="tmpl-desc">Kirim saat item berhasil masuk</div></div>
+    <div class="tmpl-card" onclick="selectWATmpl('pend
