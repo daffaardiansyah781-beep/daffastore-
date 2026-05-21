@@ -3,244 +3,265 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DaffaStore — Top Up Game Termurah & Tercepat</title>
+<title>DaffaStore — Top Up Game</title>
 <style>
-:root{
-  --bg:#06080e;--s1:#0c0f18;--s2:#111622;--s3:#161d2e;
-  --b1:#1a2235;--b2:#202840;
-  --cyan:#00d4ff;--purple:#7c3aed;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--pink:#ec4899;
-  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
-  --grad:linear-gradient(135deg,var(--purple),var(--cyan));
-}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;min-height:100vh}
 
-/* ── BG FX ── */
-.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.5}
-.orb1{width:700px;height:700px;background:rgba(124,58,237,.08);top:-200px;right:-150px;animation:drift 20s ease-in-out infinite}
-.orb2{width:500px;height:500px;background:rgba(0,212,255,.06);bottom:-100px;left:-100px;animation:drift 25s ease-in-out infinite reverse}
-.orb3{width:400px;height:400px;background:rgba(236,72,153,.05);top:40%;left:35%;animation:drift 30s ease-in-out infinite}
-@keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(30px,-20px)}66%{transform:translate(-20px,30px)}}
+/* NAV */
+nav{background:#0d1017;border-bottom:1px solid #1e2538;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1.2rem;font-weight:900}.logo span{color:#00d4ff}
+.nav-btns{display:flex;gap:8px}
+.btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;border:none;transition:.2s}
+.btn-ghost{background:transparent;border:1px solid #1e2538;color:#94a3b8}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff}
 
-/* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,60px);background:rgba(6,8,14,0);backdrop-filter:blur(0px);border-bottom:1px solid transparent;transition:all .4s}
-nav.scrolled{background:rgba(6,8,14,.92);backdrop-filter:blur(24px);border-bottom-color:var(--b1)}
-.n-logo{font-size:1.3rem;font-weight:900;letter-spacing:-.5px;cursor:pointer;position:relative;z-index:1}
-.n-logo b{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.n-links{display:flex;gap:4px;position:relative;z-index:1}
-.n-links a{color:var(--t2);font-size:.875rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:.2s;text-decoration:none}
-.n-links a:hover{color:var(--t1);background:rgba(255,255,255,.05)}
-.n-right{display:flex;gap:10px;align-items:center;position:relative;z-index:1}
-.nbtn{padding:9px 20px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;border:none}
-.nbtn-ghost{background:transparent;border:1px solid var(--b2);color:var(--t2)}
-.nbtn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
-.nbtn-main{background:var(--grad);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.3)}
-.nbtn-main:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(124,58,237,.45)}
+/* HERO */
+.hero{text-align:center;padding:60px 20px 40px}
+.badge{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:100px;padding:6px 16px;font-size:.75rem;color:#00d4ff;margin-bottom:20px}
+.hero h1{font-size:2rem;font-weight:900;line-height:1.2;margin-bottom:14px}
+.hero h1 span{background:linear-gradient(135deg,#7c3aed,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:#94a3b8;font-size:.95rem;line-height:1.7;max-width:500px;margin:0 auto 28px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta{padding:14px 28px;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer;border:none}
+.cta-main{background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff}
+.cta-sec{background:transparent;border:1px solid #1e2538;color:#e2e8f0}
 
-/* ── HERO ── */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:100px 20px 60px;position:relative;z-index:1}
-.hero-inner{max-width:860px}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.18);border-radius:100px;padding:7px 18px;font-size:.78rem;color:var(--cyan);font-weight:600;margin-bottom:28px;animation:fadeUp .8s ease}
-.hero-badge .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:livepulse 1.5s infinite}
-@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.3}}
-.hero h1{font-size:clamp(2.4rem,6vw,4.8rem);font-weight:900;line-height:1.08;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .9s ease}
-.hero h1 .line2{display:block;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-desc{font-size:clamp(.95rem,2.2vw,1.15rem);color:var(--t2);line-height:1.75;max-width:600px;margin:0 auto 40px;animation:fadeUp 1s ease}
-.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp 1.1s ease}
-.cta-main{padding:16px 36px;border-radius:14px;border:none;background:var(--grad);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;transition:all .25s;box-shadow:0 8px 32px rgba(124,58,237,.35);letter-spacing:.3px}
-.cta-main:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(124,58,237,.5)}
-.cta-sec{padding:16px 36px;border-radius:14px;border:1px solid var(--b2);background:transparent;color:var(--t1);font-size:1rem;font-weight:700;cursor:pointer;transition:all .25s}
-.cta-sec:hover{border-color:var(--cyan);color:var(--cyan)}
-.hero-stats{display:flex;justify-content:center;gap:clamp(24px,5vw,60px);margin-top:56px;flex-wrap:wrap;animation:fadeUp 1.2s ease}
-.hs-item{text-align:center}
-.hs-val{font-size:2rem;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
-.hs-lbl{font-size:.72rem;color:var(--t3);margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+/* STATS */
+.stats{display:flex;justify-content:center;gap:36px;padding:30px 20px;flex-wrap:wrap;border-top:1px solid #1e2538;border-bottom:1px solid #1e2538;margin:20px 0}
+.stat-val{font-size:1.6rem;font-weight:900;color:#00d4ff;text-align:center}
+.stat-lbl{font-size:.7rem;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
-/* ── TICKER ── */
-.ticker-wrap{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(0,212,255,.05));border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);padding:12px 0;overflow:hidden;position:relative;z-index:1}
-.ticker{display:flex;gap:48px;animation:tickerAnim 35s linear infinite;width:max-content}
-.ti{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--t2);white-space:nowrap;font-weight:500}
-.ti .dot{width:6px;height:6px;background:var(--green);border-radius:50%;flex-shrink:0}
-@keyframes tickerAnim{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* SECTION */
+.section{padding:40px 20px;max-width:900px;margin:0 auto}
+.sec-title{font-size:1.3rem;font-weight:900;margin-bottom:6px}
+.sec-sub{color:#94a3b8;font-size:.85rem;margin-bottom:24px}
 
-/* ── SECTION BASE ── */
-.section{padding:clamp(60px,10vw,110px) clamp(16px,5vw,60px);position:relative;z-index:1;max-width:1200px;margin:0 auto}
-.sec-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:100px;padding:5px 16px;font-size:.72rem;color:#a78bfa;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px}
-.sec-h{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;line-height:1.15;letter-spacing:-.8px;margin-bottom:14px}
-.sec-sub{font-size:clamp(.9rem,2vw,1.05rem);color:var(--t2);line-height:1.7;max-width:560px}
+/* GAME GRID */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.game-card{background:#131820;border:1px solid #1e2538;border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:.2s}
+.game-card:hover{border-color:#00d4ff;transform:translateY(-3px)}
+.game-icon{font-size:2rem;margin-bottom:8px}
+.game-name{font-size:.82rem;font-weight:700;margin-bottom:4px}
+.game-price{font-size:.72rem;color:#00d4ff}
 
-/* ── FEATURES ── */
-.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:48px}
-.feat-card{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:28px;transition:all .3s;position:relative;overflow:hidden;cursor:default}
-.feat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(0,212,255,.02));opacity:0;transition:.3s}
-.feat-card:hover::before{opacity:1}
-.feat-card:hover{border-color:rgba(0,212,255,.25);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
-.feat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px}
-.feat-title{font-size:1.05rem;font-weight:800;margin-bottom:10px}
-.feat-desc{font-size:.85rem;color:var(--t2);line-height:1.7}
-.feat-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:14px}
+/* FITUR */
+.fitur-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.fitur-card{background:#131820;border:1px solid #1e2538;border-radius:14px;padding:20px}
+.fitur-icon{font-size:1.6rem;margin-bottom:10px}
+.fitur-title{font-weight:700;margin-bottom:6px;font-size:.9rem}
+.fitur-desc{font-size:.78rem;color:#94a3b8;line-height:1.6}
 
-/* ── HOW ── */
-.how-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin-top:48px;position:relative}
-.how-wrap::before{content:'';position:absolute;top:24px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--b2),var(--b2),transparent);z-index:0}
-.how-card{text-align:center;padding:0 20px;position:relative;z-index:1}
-.how-num{width:48px;height:48px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;margin:0 auto 18px;box-shadow:0 4px 20px rgba(124,58,237,.4)}
-.how-title{font-size:.95rem;font-weight:800;margin-bottom:8px}
-.how-desc{font-size:.8rem;color:var(--t2);line-height:1.6}
+/* PROMO */
+.promo-banner{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(0,212,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:16px;padding:24px;margin:20px 0}
+.promo-title{font-size:1.1rem;font-weight:800;margin-bottom:8px}
+.promo-desc{color:#94a3b8;font-size:.85rem;margin-bottom:14px}
+.promo-codes{display:flex;gap:10px;flex-wrap:wrap}
+.promo-code{background:rgba(0,212,255,.08);border:1px dashed rgba(0,212,255,.3);border-radius:8px;padding:8px 14px;cursor:pointer}
+.pc-text{font-family:monospace;font-size:.9rem;font-weight:900;color:#00d4ff}
+.pc-desc{font-size:.68rem;color:#94a3b8;margin-top:2px}
 
-/* ── GAMES SHOWCASE ── */
-.games-scroll{display:flex;gap:14px;overflow-x:auto;padding:24px 0 8px;scrollbar-width:none;margin-top:32px}
-.games-scroll::-webkit-scrollbar{display:none}
-.gs-card{background:var(--s2);border:1px solid var(--b1);border-radius:18px;padding:20px 18px;text-align:center;min-width:140px;cursor:pointer;transition:all .25s;flex-shrink:0}
-.gs-card:hover{border-color:rgba(0,212,255,.35);transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,212,255,.1)}
-.gs-card.active{border-color:var(--cyan);background:rgba(0,212,255,.06)}
-.gs-icon{font-size:2.2rem;margin-bottom:10px}
-.gs-name{font-size:.8rem;font-weight:700;margin-bottom:4px}
-.gs-price{font-size:.72rem;color:var(--cyan);font-weight:600}
+/* FOOTER */
+footer{background:#0d1017;border-top:1px solid #1e2538;padding:30px 20px;text-align:center}
+.f-logo{font-size:1.1rem;font-weight:900;margin-bottom:8px}.f-logo span{color:#00d4ff}
+.f-text{font-size:.78rem;color:#475569}
+.f-pay{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.pay-badge{background:#131820;border:1px solid #1e2538;border-radius:6px;padding:4px 10px;font-size:.7rem;color:#94a3b8}
 
-/* ── TESTIMONIALS ── */
-.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:48px}
-.testi-card{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:24px;transition:.3s}
-.testi-card:hover{border-color:var(--b2);transform:translateY(-2px)}
-.testi-stars{color:var(--gold);font-size:1rem;letter-spacing:2px;margin-bottom:12px}
-.testi-text{font-size:.875rem;color:var(--t2);line-height:1.7;margin-bottom:18px;font-style:italic}
-.testi-user{display:flex;align-items:center;gap:10px}
-.testi-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;color:#fff;flex-shrink:0}
-.testi-name{font-weight:700;font-size:.85rem}
-.testi-game{font-size:.72rem;color:var(--t3)}
+/* MODAL LOGIN */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#131820;border:1px solid #1e2538;border-radius:20px;width:100%;max-width:380px;overflow:hidden}
+.modal-tabs{display:flex;background:#0d1017;border-bottom:1px solid #1e2538}
+.m-tab{flex:1;padding:14px;text-align:center;font-size:.85rem;font-weight:700;cursor:pointer;color:#475569;border-bottom:2px solid transparent;transition:.2s}
+.m-tab.active{color:#00d4ff;border-bottom-color:#00d4ff}
+.modal-body{padding:24px}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl label{font-size:.75rem;color:#94a3b8;font-weight:600}
+.fl input{background:#181f2e;border:1px solid #252d42;border-radius:8px;padding:11px 13px;color:#e2e8f0;font-size:.88rem;outline:none;width:100%}
+.m-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;font-size:.9rem;font-weight:800;cursor:pointer;margin-top:4px}
+.m-hint{font-size:.72rem;color:#475569;text-align:center;margin-top:10px}
+.m-close{position:absolute;top:12px;right:12px;background:#1e2538;border:none;color:#94a3b8;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.85rem}
 
-/* ── FAQ ── */
-.faq-list{margin-top:40px;display:flex;flex-direction:column;gap:10px}
-.faq-item{background:var(--s2);border:1px solid var(--b1);border-radius:14px;overflow:hidden;transition:.2s}
-.faq-item:hover{border-color:var(--b2)}
-.faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;font-size:.9rem;font-weight:700;gap:12px}
-.faq-arrow{font-size:.75rem;transition:transform .3s;color:var(--t3);flex-shrink:0}
-.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--cyan)}
-.faq-item.open .faq-q{color:var(--cyan)}
-.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.faq-item.open .faq-a{max-height:300px}
-.faq-a-inner{padding:0 22px 18px;font-size:.85rem;color:var(--t2);line-height:1.75;border-top:1px solid var(--b1)}
+/* TOPUP LINK */
+.topup-banner{background:#131820;border:1px solid #1e2538;border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:20px 0}
+.tb-text h3{font-size:1rem;font-weight:800;margin-bottom:4px}
+.tb-text p{font-size:.8rem;color:#94a3b8}
 
-/* ── PROMO BANNER ── */
-.promo-section{padding:clamp(40px,6vw,80px) clamp(16px,5vw,60px);position:relative;z-index:1}
-.promo-banner{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(0,212,255,.1));border:1px solid rgba(0,212,255,.15);border-radius:24px;padding:clamp(28px,5vw,48px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
-.promo-banner::before{content:'🎉';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-size:8rem;opacity:.06;pointer-events:none}
-.pb-left h2{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;margin-bottom:8px}
-.pb-left p{color:var(--t2);font-size:.9rem;line-height:1.6}
-.promo-codes{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-.pc-item{background:rgba(0,212,255,.08);border:1px dashed rgba(0,212,255,.3);border-radius:10px;padding:10px 18px;cursor:pointer;transition:.2s}
-.pc-item:hover{background:rgba(0,212,255,.15)}
-.pc-code{font-family:monospace;font-size:1rem;font-weight:900;color:var(--cyan);letter-spacing:2px}
-.pc-desc{font-size:.7rem;color:var(--t2);margin-top:3px}
+/* TOAST */
+.toast-w{position:fixed;bottom:20px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:#0d1017;border:1px solid #1e2538;border-radius:100px;padding:8px 18px;font-size:.75rem;font-weight:600;color:#10b981;border-color:#10b981}
+</style>
+</head>
+<body>
 
-/* ── CTA SECTION ── */
-.cta-section{text-align:center;padding:clamp(60px,10vw,100px) 20px;position:relative;z-index:1}
-.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(124,58,237,.15),transparent 70%);pointer-events:none}
+<!-- NAV -->
+<nav>
+  <div class="logo">Daffa<span>Store</span></div>
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="openModal('login')">Masuk</button>
+    <button class="btn btn-primary" onclick="openModal('register')">Daftar</button>
+  </div>
+</nav>
 
-/* ── PORTAL (AUTH) ── */
-.portal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.portal-overlay.show{display:flex}
-.portal-box{background:var(--s1);border:1px solid var(--b1);border-radius:24px;width:100%;max-width:420px;overflow:hidden;animation:popUp .3s cubic-bezier(.34,1.56,.64,1)}
-@keyframes popUp{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.portal-tabs{display:flex;background:var(--s2);border-bottom:1px solid var(--b1)}
-.portal-tab{flex:1;padding:14px;text-align:center;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;transition:.2s}
-.portal-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-.portal-body{padding:28px}
-.pf{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.pf label{font-size:.78rem;color:var(--t2);font-weight:600}
-.pf input{background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;color:var(--t1);font-size:.9rem;outline:none;transition:.2s;width:100%}
-.pf input:focus{border-color:var(--cyan);background:var(--s2)}
-.pf input::placeholder{color:var(--t3)}
-.p-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--grad);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;margin-top:6px;transition:.2s;letter-spacing:.3px;box-shadow:0 4px 20px rgba(124,58,237,.3)}
-.p-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(124,58,237,.45)}
-.p-divider{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:.75rem;margin:16px 0}
-.p-divider::before,.p-divider::after{content:'';flex:1;height:1px;background:var(--b1)}
-.social-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.s-btn{padding:11px;border:1px solid var(--b2);border-radius:10px;background:var(--s3);color:var(--t1);font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.s-btn:hover{border-color:var(--b3);background:var(--s2)}
-.p-close-btn{position:absolute;top:14px;right:14px;background:var(--s3);border:1px solid var(--b1);border-radius:50%;width:30px;height:30px;color:var(--t2);cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:.2s}
-.p-close-btn:hover{color:var(--red)}
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">⚡ Proses Otomatis · Instan · 24/7</div>
+  <h1>Top Up Game Favorit<br><span>Lebih Cepat & Murah</span></h1>
+  <p>Platform top up game terpercaya. Harga termurah, proses otomatis instan, dan layanan pelanggan 24 jam.</p>
+  <div class="hero-btns">
+    <button class="cta cta-main" onclick="window.location.href='topup.html'">🎮 Top Up Sekarang</button>
+    <button class="cta cta-sec" onclick="openModal('register')">Daftar Gratis →</button>
+  </div>
+</div>
 
-/* ── DASHBOARD PORTAL ── */
-.dash-portal{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column;animation:fadeIn .3s ease}
-.dash-portal.show{display:flex}
-.dp-nav{height:56px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,40px);flex-shrink:0}
-.dp-user{display:flex;align-items:center;gap:10px}
-.dp-avatar{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800}
-.dp-name{font-weight:700;font-size:.9rem}
-.dp-email{font-size:.72rem;color:var(--t3)}
-.dp-tabs{display:flex;gap:4px}
-.dp-tab{padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:var(--t2);background:none;border:none;transition:.2s}
-.dp-tab.active,.dp-tab:hover{color:var(--t1);background:var(--s3)}
-.dp-content{flex:1;overflow-y:auto;padding:clamp(20px,4vw,40px)}
-.dp-section{display:none}.dp-section.active{display:block}
+<!-- STATS -->
+<div class="stats">
+  <div><div class="stat-val">2.5 Jt+</div><div class="stat-lbl">Transaksi</div></div>
+  <div><div class="stat-val">30+</div><div class="stat-lbl">Game</div></div>
+  <div><div class="stat-val">&lt;30s</div><div class="stat-lbl">Proses</div></div>
+  <div><div class="stat-val">4.9★</div><div class="stat-lbl">Rating</div></div>
+</div>
 
-/* POINTS CARD */
-.points-banner{background:linear-gradient(135deg,var(--purple),var(--cyan));border-radius:20px;padding:clamp(20px,4vw,32px);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
-.pb-val{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1}
-.pb-lbl{font-size:.8rem;opacity:.8;margin-top:4px}
-.points-actions{display:flex;gap:10px;flex-wrap:wrap}
-.pa-btn{padding:10px 20px;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;border:none}
-.pa-btn-white{background:rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(4px)}
-.pa-btn-white:hover{background:rgba(255,255,255,.3)}
-.pa-btn-solid{background:#fff;color:var(--purple)}
-.pa-btn-solid:hover{transform:translateY(-1px)}
+<!-- GAMES -->
+<div class="section" id="games">
+  <div class="sec-title">🎮 Game Tersedia</div>
+  <div class="sec-sub">Pilih game yang ingin kamu top up</div>
+  <div class="game-grid">
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">⚔️</div><div class="game-name">Mobile Legends</div><div class="game-price">Mulai Rp 19.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🔥</div><div class="game-name">Free Fire</div><div class="game-price">Mulai Rp 14.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🪖</div><div class="game-name">PUBG Mobile</div><div class="game-price">Mulai Rp 17.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🌟</div><div class="game-name">Genshin Impact</div><div class="game-price">Mulai Rp 15.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🚂</div><div class="game-name">Honkai Star Rail</div><div class="game-price">Mulai Rp 15.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">⚡</div><div class="game-name">Zenless Zone Zero</div><div class="game-price">Mulai Rp 15.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🎯</div><div class="game-name">Call of Duty</div><div class="game-price">Mulai Rp 15.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🎮</div><div class="game-name">Valorant</div><div class="game-price">Mulai Rp 52.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🟥</div><div class="game-name">Roblox</div><div class="game-price">Mulai Rp 55.000</div></div>
+    <div class="game-card" onclick="goTopup()"><div class="game-icon">🦁</div><div class="game-name">Wild Rift</div><div class="game-price">Mulai Rp 52.000</div></div>
+  </div>
+</div>
 
-/* STATS MINI */
-.mini-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-.ms-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px}
-.ms-val{font-size:1.5rem;font-weight:900;color:var(--cyan);margin-bottom:4px}
-.ms-lbl{font-size:.75rem;color:var(--t3)}
+<!-- PROMO -->
+<div class="section">
+  <div class="promo-banner">
+    <div>
+      <div class="promo-title">🎉 Kode Promo Aktif!</div>
+      <div class="promo-desc">Klik kode untuk menyalin</div>
+      <div class="promo-codes">
+        <div class="promo-code" onclick="copyPromo('DAFFAML10')"><div class="pc-text">DAFFAML10</div><div class="pc-desc">Diskon 10% ML</div></div>
+        <div class="promo-code" onclick="copyPromo('NEWUSER20')"><div class="pc-text">NEWUSER20</div><div class="pc-desc">Diskon 20% baru</div></div>
+        <div class="promo-code" onclick="copyPromo('TOPUP5K')"><div class="pc-text">TOPUP5K</div><div class="pc-desc">Potongan Rp 5.000</div></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-/* ORDER HISTORY */
-.order-list{display:flex;flex-direction:column;gap:10px}
-.ol-item{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s}
-.ol-item:hover{border-color:var(--b2);background:var(--s3)}
-.ol-icon{font-size:1.8rem;width:42px;text-align:center}
-.ol-info{flex:1}
-.ol-game{font-weight:700;font-size:.9rem}
-.ol-item-name{font-size:.75rem;color:var(--t2);margin-top:2px}
-.ol-date{font-size:.68rem;color:var(--t3);margin-top:3px}
-.ol-right{text-align:right}
-.ol-price{font-weight:800;font-size:.9rem;color:var(--cyan)}
-.ol-status{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;margin-top:4px;display:inline-block}
-.st-ok{background:rgba(16,185,129,.12);color:var(--green)}
-.st-pend{background:rgba(245,158,11,.12);color:var(--gold)}
-.st-fail{background:rgba(239,68,68,.12);color:var(--red)}
+<!-- FITUR -->
+<div class="section">
+  <div class="sec-title">✨ Kenapa DaffaStore?</div>
+  <div class="sec-sub">Terpercaya dan tercepat</div>
+  <div class="fitur-grid">
+    <div class="fitur-card"><div class="fitur-icon">⚡</div><div class="fitur-title">Proses Instan Otomatis</div><div class="fitur-desc">Item masuk ke akun game dalam hitungan detik setelah pembayaran dikonfirmasi.</div></div>
+    <div class="fitur-card"><div class="fitur-icon">💰</div><div class="fitur-title">Harga Termurah</div><div class="fitur-desc">Bermitra langsung dengan supplier resmi. Hemat hingga 15% dibanding platform lain.</div></div>
+    <div class="fitur-card"><div class="fitur-icon">🛡️</div><div class="fitur-title">100% Aman</div><div class="fitur-desc">Pembayaran diproses Midtrans berlisensi Bank Indonesia. Data terenkripsi SSL.</div></div>
+    <div class="fitur-card"><div class="fitur-icon">💳</div><div class="fitur-title">12+ Metode Bayar</div><div class="fitur-desc">QRIS, GoPay, OVO, Dana, Transfer Bank, Alfamart, Indomaret dan lainnya.</div></div>
+    <div class="fitur-card"><div class="fitur-icon">🎁</div><div class="fitur-title">Poin Reward</div><div class="fitur-desc">Setiap top up hasilkan poin yang bisa ditukar diskon menarik.</div></div>
+    <div class="fitur-card"><div class="fitur-icon">🎧</div><div class="fitur-title">CS 24 Jam</div><div class="fitur-desc">Tim customer service siap membantu via WhatsApp kapan saja.</div></div>
+  </div>
+</div>
 
-/* REFERRAL */
-.ref-card{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:24px;margin-bottom:16px}
-.ref-code-box{background:var(--s3);border:1px dashed rgba(0,212,255,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0}
-.ref-code{font-family:monospace;font-size:1.3rem;font-weight:900;color:var(--cyan);letter-spacing:3px}
-.ref-copy{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:8px;color:var(--cyan);padding:7px 14px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s}
-.ref-copy:hover{background:rgba(0,212,255,.2)}
-.ref-steps{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-.rs-item{flex:1;min-width:140px;background:var(--s3);border-radius:12px;padding:14px;text-align:center}
-.rs-icon{font-size:1.5rem;margin-bottom:8px}
-.rs-title{font-size:.8rem;font-weight:700;margin-bottom:4px}
-.rs-desc{font-size:.72rem;color:var(--t2)}
-.ref-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:16px}
-.ref-table th{text-align:left;padding:8px 12px;background:var(--s3);color:var(--t3);font-size:.68rem;font-weight:700;text-transform:uppercase}
-.ref-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+<!-- TOPUP BANNER -->
+<div class="section">
+  <div class="topup-banner">
+    <div class="tb-text">
+      <h3>🚀 Siap Top Up Sekarang?</h3>
+      <p>Pilih game favorit dan selesaikan dalam 3 langkah mudah</p>
+    </div>
+    <button class="btn btn-primary" style="padding:12px 24px" onclick="goTopup()">Top Up Sekarang →</button>
+  </div>
+</div>
 
-/* VOUCHER */
-.voucher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px}
-.vc-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;position:relative;overflow:hidden;cursor:pointer;transition:.2s}
-.vc-card:hover{border-color:var(--b2);transform:translateY(-2px)}
-.vc-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:rgba(255,255,255,.02);border-radius:50%;transform:translate(20px,-20px)}
-.vc-pts{font-size:1.3rem;font-weight:900;color:var(--gold);margin-bottom:4px}
-.vc-name{font-size:.9rem;font-weight:700;margin-bottom:6px}
-.vc-desc{font-size:.75rem;color:var(--t2);line-height:1.5}
-.vc-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:10px}
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">Daffa<span>Store</span></div>
+  <div class="f-text">Platform Top Up Game Terpercaya #1 Indonesia</div>
+  <div class="f-pay">
+    <div class="pay-badge">QRIS</div>
+    <div class="pay-badge">GoPay</div>
+    <div class="pay-badge">OVO</div>
+    <div class="pay-badge">Dana</div>
+    <div class="pay-badge">BCA</div>
+    <div class="pay-badge">Midtrans</div>
+  </div>
+  <div style="margin-top:14px;font-size:.72rem;color:#1e2538">© 2025 DaffaStore</div>
+</footer>
 
-/* PROFILE */
-.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:640px){.profile-grid{grid-template-columns:1fr}}
-.prof-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:20px}
-.prof-title{font-size:.85rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.pf2{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-.pf2 label{font-size:.72rem;color:var(--t3);font-weight:600}
-.pf2 input{background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--t1);font-size:.85
+<!-- MODAL LOGIN/REGISTER -->
+<div class="modal-bg" id="modalBg" onclick="handleBgClick(event)">
+  <div style="position:relative;width:100%;max-width:380px">
+    <button class="m-close" onclick="closeModal()">✕</button>
+    <div class="modal">
+      <div class="modal-tabs">
+        <div class="m-tab active" id="tab-login" onclick="switchTab('login')">Masuk</div>
+        <div class="m-tab" id="tab-register" onclick="switchTab('register')">Daftar</div>
+      </div>
+      <div class="modal-body">
+        <div id="form-login">
+          <div class="fl"><label>Email</label><input type="email" placeholder="email@kamu.com" id="loginEmail"></div>
+          <div class="fl"><label>Password</label><input type="password" placeholder="••••••••" id="loginPass"></div>
+          <button class="m-btn" onclick="doLogin()">Masuk</button>
+          <div class="m-hint">Demo: user@demo.com / demo123</div>
+        </div>
+        <div id="form-register" style="display:none">
+          <div class="fl"><label>Nama Lengkap</label><input type="text" placeholder="Nama kamu" id="regName"></div>
+          <div class="fl"><label>Email</label><input type="email" placeholder="email@kamu.com" id="regEmail"></div>
+          <div class="fl"><label>Password</label><input type="password" placeholder="Min. 8 karakter" id="regPass"></div>
+          <button class="m-btn" onclick="doRegister()">🎁 Daftar & Klaim 500 Poin</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-w" id="toastW"></div>
+
+<script>
+function goTopup(){ window.location.href='topup.html'; }
+function openModal(tab){ document.getElementById('modalBg').classList.add('show'); switchTab(tab); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+function handleBgClick(e){ if(e.target===document.getElementById('modalBg')) closeModal(); }
+function switchTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('form-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('form-register').style.display = tab==='register'?'block':'none';
+}
+function doLogin(){
+  const e = document.getElementById('loginEmail').value;
+  const p = document.getElementById('loginPass').value;
+  if(!e||!p){ toast('Isi email dan password dulu'); return; }
+  closeModal(); toast('Login berhasil! Selamat datang 👋');
+}
+function doRegister(){
+  const n = document.getElementById('regName').value;
+  const e = document.getElementById('regEmail').value;
+  const p = document.getElementById('regPass').value;
+  if(!n||!e||!p){ toast('Lengkapi semua data'); return; }
+  closeModal(); toast('Daftar berhasil! 500 poin bonus ditambahkan 🎉');
+}
+function copyPromo(code){
+  navigator.clipboard.writeText(code).catch(()=>{});
+  toast('Kode ' + code + ' disalin! 🎉');
+}
+function toast(msg){
+  const w = document.getElementById('toastW');
+  const d = document.createElement('div');
+  d.className = 'toast';
+  d.textContent = msg;
+  w.appendChild(d);
+  setTimeout(()=>d.remove(), 3000);
+}
+</script>
+</body>
+</html>
