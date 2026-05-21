@@ -4,299 +4,504 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DaffaStore — Top Up Game</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <style>
-:root {
-  --bg:#07090f;--s1:#0d1017;--s2:#131720;--s3:#181e2c;
-  --b1:#1e2538;--b2:#252d42;
-  --cyan:#00d4ff;--purple:#7c3aed;--pink:#ec4899;--green:#10b981;--gold:#f59e0b;--red:#ef4444;
-  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
-  --r:12px;--r2:16px;--r3:20px;
-}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--s1)}
-::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
-
-/* BG FX */
-.bg-fx{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.bg-fx span{position:absolute;border-radius:50%;filter:blur(100px);opacity:.5}
-.bg-fx span:nth-child(1){width:700px;height:700px;background:rgba(124,58,237,.07);top:-200px;right:-200px}
-.bg-fx span:nth-child(2){width:500px;height:500px;background:rgba(0,212,255,.05);bottom:-100px;left:-100px}
-.bg-fx span:nth-child(3){width:400px;height:400px;background:rgba(236,72,153,.05);top:50%;left:30%}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#e2e8f0;min-height:100vh}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,48px);background:rgba(7,9,15,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--b1)}
-.logo{font-size:1.3rem;font-weight:800;letter-spacing:-0.5px;cursor:pointer}
-.logo b{color:var(--cyan)}
-.nav-menu{display:flex;gap:4px}
-.nav-menu button{background:none;border:none;color:var(--t2);font-size:.875rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:.2s}
-.nav-menu button:hover,.nav-menu button.active{color:var(--t1);background:var(--s2)}
-.nav-right{display:flex;gap:10px;align-items:center}
-.badge-cart{position:relative;cursor:pointer}
-.badge-cart .dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--cyan);border-radius:50%;border:2px solid var(--bg)}
+nav{background:#0d1017;border-bottom:1px solid #1e2538;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1.1rem;font-weight:900}.logo span{color:#00d4ff}
+.back-btn{background:transparent;border:1px solid #1e2538;border-radius:8px;color:#94a3b8;padding:7px 14px;font-size:.78rem;cursor:pointer}
 
-/* PAGES */
-.page{display:none;position:relative;z-index:1}
-.page.active{display:block}
+/* HALAMAN */
+.page{display:none}.page.active{display:block}
 
-/* HERO */
-.hero{text-align:center;padding:clamp(40px,8vw,90px) 20px 50px;max-width:820px;margin:0 auto}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:100px;padding:5px 16px;font-size:.78rem;font-weight:600;color:var(--cyan);margin-bottom:24px;letter-spacing:.3px}
-.hero h1{font-size:clamp(2rem,5vw,3.8rem);font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:16px}
-.grad-text{background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{color:var(--t2);font-size:clamp(.95rem,2vw,1.1rem);line-height:1.7;max-width:560px;margin:0 auto 36px}
+/* ===== HALAMAN 1: PILIH GAME ===== */
+.hero-small{text-align:center;padding:30px 20px 20px}
+.hero-small h1{font-size:1.5rem;font-weight:900;margin-bottom:8px}
+.hero-small h1 span{color:#00d4ff}
+.hero-small p{color:#94a3b8;font-size:.85rem}
 
-/* STATS BAR */
-.stats-bar{display:flex;justify-content:center;gap:clamp(24px,5vw,60px);padding:20px 20px 56px;flex-wrap:wrap}
-.stat-item{text-align:center}
-.stat-num{font-size:1.8rem;font-weight:900;line-height:1}
-.stat-lbl{font-size:.72rem;color:var(--t3);margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.search-wrap{padding:0 16px 16px;max-width:700px;margin:0 auto}
+.search-input{width:100%;background:#131820;border:1px solid #1e2538;border-radius:10px;padding:12px 16px;color:#e2e8f0;font-size:.88rem;outline:none}
+.search-input:focus{border-color:#00d4ff}
 
-/* PROMO TICKER */
-.ticker-wrap{overflow:hidden;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(0,212,255,.08));border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);padding:10px 0;margin-bottom:0}
-.ticker{display:flex;gap:60px;animation:ticker 30s linear infinite;width:max-content}
-.ticker-item{white-space:nowrap;font-size:.8rem;color:var(--t2);font-weight:500;display:flex;align-items:center;gap:8px}
-.ticker-item span{color:var(--cyan)}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.filter-wrap{display:flex;gap:8px;padding:0 16px 16px;overflow-x:auto;max-width:700px;margin:0 auto}
+.filter-wrap::-webkit-scrollbar{display:none}
+.pill{padding:7px 14px;border-radius:100px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid #1e2538;background:#131820;color:#94a3b8;white-space:nowrap;transition:.2s}
+.pill.active{background:rgba(0,212,255,.1);border-color:#00d4ff;color:#00d4ff}
 
-/* SEARCH */
-.search-wrap{padding:32px clamp(16px,4vw,48px) 0;max-width:1300px;margin:0 auto;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.search-input-wrap{position:relative;flex:1;min-width:220px}
-.search-input-wrap input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:12px 16px 12px 44px;color:var(--t1);font-size:.9rem;outline:none;transition:.2s}
-.search-input-wrap input:focus{border-color:var(--cyan)}
-.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:.5}
-.filter-pills{display:flex;gap:8px;flex-wrap:wrap}
-.pill{padding:8px 16px;border-radius:100px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;border:1px solid var(--b1);background:var(--s2);color:var(--t2)}
-.pill:hover{border-color:var(--cyan);color:var(--cyan)}
-.pill.active{background:rgba(0,212,255,.1);border-color:var(--cyan);color:var(--cyan)}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:0 16px 30px;max-width:700px;margin:0 auto}
+.g-card{background:#131820;border:1px solid #1e2538;border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.g-card:hover,.g-card:active{border-color:#00d4ff;transform:translateY(-2px)}
+.g-icon{font-size:2.2rem;margin-bottom:8px}
+.g-name{font-size:.8rem;font-weight:700;margin-bottom:4px}
+.g-cat{font-size:.68rem;background:#1e2538;color:#94a3b8;padding:2px 8px;border-radius:100px}
+.g-badge{position:absolute;top:8px;right:8px;font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:100px;background:#ef4444;color:#fff}
 
-/* GAME GRID */
-.section{padding:28px clamp(16px,4vw,48px);max-width:1300px;margin:0 auto}
-.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.sec-title{font-size:1.15rem;font-weight:800}
-.sec-count{font-size:.8rem;color:var(--t3)}
-.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
-.g-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:18px 14px 16px;text-align:center;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
-.g-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(124,58,237,.04));opacity:0;transition:.22s}
-.g-card:hover::after{opacity:1}
-.g-card:hover{border-color:rgba(0,212,255,.4);transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,212,255,.1)}
-.g-icon{font-size:2.4rem;margin-bottom:10px;display:block;line-height:1}
-.g-name{font-size:.85rem;font-weight:700;margin-bottom:5px;line-height:1.3}
-.g-cat{font-size:.7rem;background:var(--s3);color:var(--t3);padding:2px 9px;border-radius:100px;display:inline-block}
-.g-badge{position:absolute;top:8px;right:8px;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:100px;text-transform:uppercase}
-.b-hot{background:var(--red);color:#fff}
-.b-new{background:var(--green);color:#fff}
-.b-sale{background:var(--gold);color:#000}
+/* ===== HALAMAN 2: FORM TOPUP ===== */
+.topup-wrap{padding:16px;max-width:700px;margin:0 auto}
+.game-header{display:flex;align-items:center;gap:14px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:14px;padding:16px;margin-bottom:16px}
+.gh-icon{font-size:2.8rem}
+.gh-name{font-size:1.1rem;font-weight:900}
+.gh-cat{font-size:.75rem;color:#94a3b8;margin-top:2px}
+.gh-tag{display:inline-block;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10b981;font-size:.68rem;font-weight:700;padding:2px 10px;border-radius:100px;margin-top:5px}
 
-/* ===== TOP UP FORM ===== */
-.topup-page{padding:24px clamp(16px,4vw,48px);max-width:1100px;margin:0 auto}
-.back-btn{display:inline-flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:8px 18px;font-size:.85rem;cursor:pointer;transition:.2s;margin-bottom:24px;color:var(--t1)}
-.back-btn:hover{border-color:var(--cyan);color:var(--cyan)}
-.topup-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
-@media(max-width:768px){.topup-layout{grid-template-columns:1fr}.nav-menu{display:none}}
-.t-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:24px;margin-bottom:16px}
-.step-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.step-num{width:30px;height:30px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0}
-.step-title{font-size:1rem;font-weight:700}
-.step-sub{font-size:.78rem;color:var(--t3)}
+.card{background:#131820;border:1px solid #1e2538;border-radius:14px;padding:18px;margin-bottom:14px}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.step-num{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#fff;flex-shrink:0}
+.step-title{font-size:.9rem;font-weight:700}
+.step-sub{font-size:.72rem;color:#475569}
 
-/* GAME INFO HEADER */
-.game-header{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(124,58,237,.06));border:1px solid rgba(0,212,255,.15);border-radius:var(--r2);padding:18px 20px;margin-bottom:20px}
-.game-header-icon{font-size:3rem;line-height:1}
-.game-header-name{font-size:1.3rem;font-weight:800}
-.game-header-cat{font-size:.78rem;color:var(--t2);margin-top:2px}
-.game-header-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--green);font-size:.72rem;padding:3px 10px;border-radius:100px;margin-top:6px;font-weight:600}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fl label{font-size:.75rem;color:#94a3b8;font-weight:600}
+.fl input,.fl select{background:#181f2e;border:1px solid #252d42;border-radius:8px;padding:11px 13px;color:#e2e8f0;font-size:.88rem;outline:none;width:100%;transition:.2s}
+.fl input:focus,.fl select:focus{border-color:#00d4ff}
+.fl select option{background:#0d1017}
 
-/* FORM ELEMENTS */
-.fl{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.fl label{font-size:.82rem;color:var(--t2);font-weight:600}
-.fl input,.fl select{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:12px 15px;color:var(--t1);font-size:.92rem;outline:none;transition:.2s;width:100%}
-.fl input:focus,.fl select:focus{border-color:var(--cyan);background:var(--s1)}
-.fl input::placeholder{color:var(--t3)}
-.fl select option{background:var(--s1)}
-.input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.field-note{font-size:.74rem;color:var(--t3);margin-top:-10px}
+.verify-ok{display:flex;align-items:center;gap:8px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:8px;padding:10px 13px;font-size:.8rem;color:#10b981;margin-bottom:12px}
 
-/* VERIFY STRIP */
-.verify-strip{display:flex;align-items:center;gap:10px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:var(--r);padding:11px 14px;font-size:.82rem;color:var(--green);margin-bottom:16px}
-
-/* NOMINAL GRID */
 .nom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:500px){.nom-grid{grid-template-columns:repeat(2,1fr)}}
-.nom-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
-.nom-card:hover{border-color:rgba(124,58,237,.5)}
-.nom-card.sel{border-color:var(--cyan);background:rgba(0,212,255,.07);box-shadow:0 0 18px rgba(0,212,255,.1)}
-.nom-check{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:var(--cyan);display:none;align-items:center;justify-content:center;font-size:.65rem;color:#000;font-weight:900}
+.nom-card{background:#181f2e;border:1px solid #252d42;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.nom-card:hover,.nom-card.sel{border-color:#00d4ff;background:rgba(0,212,255,.06)}
+.nom-check{display:none;position:absolute;top:6px;right:6px;width:16px;height:16px;background:#00d4ff;border-radius:50%;font-size:.6rem;align-items:center;justify-content:center;color:#000;font-weight:900}
 .nom-card.sel .nom-check{display:flex}
-.nom-amt{font-size:1.1rem;font-weight:800;color:var(--t1)}
-.nom-curr{font-size:.7rem;color:var(--t3);margin-bottom:6px}
-.nom-price{font-size:.82rem;font-weight:700;color:var(--cyan)}
-.nom-orig{font-size:.7rem;color:var(--t3);text-decoration:line-through}
-.nom-disc{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:.6rem;font-weight:800;padding:2px 8px;border-radius:100px;white-space:nowrap}
+.nom-amt{font-size:1rem;font-weight:800}
+.nom-curr{font-size:.65rem;color:#94a3b8;margin-bottom:4px}
+.nom-price{font-size:.78rem;font-weight:700;color:#00d4ff}
+.nom-disc{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;font-size:.58rem;font-weight:800;padding:1px 7px;border-radius:100px;white-space:nowrap}
 
-/* PAYMENT */
-.pay-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.pay-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:13px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:10px}
-.pay-card:hover{border-color:rgba(124,58,237,.5)}
-.pay-card.sel{border-color:var(--cyan);background:rgba(0,212,255,.06)}
-.pay-icon{font-size:1.5rem;width:36px;text-align:center}
-.pay-name{font-size:.85rem;font-weight:700}
-.pay-desc{font-size:.7rem;color:var(--t3)}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pay-card{background:#181f2e;border:1px solid #252d42;border-radius:10px;padding:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:10px}
+.pay-card:hover,.pay-card.sel{border-color:#00d4ff;background:rgba(0,212,255,.05)}
+.pay-icon{font-size:1.4rem}
+.pay-name{font-size:.82rem;font-weight:700}
+.pay-desc{font-size:.68rem;color:#475569}
 
-/* COUPON */
-.coupon-row{display:flex;gap:10px;margin-bottom:16px}
-.coupon-row input{flex:1;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r);padding:11px 14px;color:var(--t1);font-size:.88rem;outline:none;transition:.2s}
-.coupon-row input:focus{border-color:var(--gold)}
-.coupon-row button{padding:0 18px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);color:var(--gold);font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
-.coupon-row button:hover{background:rgba(245,158,11,.2)}
-.coupon-ok{display:none;font-size:.78rem;color:var(--green);margin-bottom:12px;align-items:center;gap:6px}
-.coupon-ok.show{display:flex}
+.coupon-row{display:flex;gap:8px;margin-bottom:12px}
+.coupon-input{flex:1;background:#181f2e;border:1px solid #252d42;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:.82rem;outline:none}
+.coupon-btn{padding:0 16px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:8px;color:#f59e0b;font-size:.78rem;font-weight:700;cursor:pointer}
+.coupon-ok{display:none;font-size:.75rem;color:#10b981;margin-bottom:10px}
+.coupon-ok.show{display:flex;align-items:center;gap:6px}
 
 /* SUMMARY */
-.sum-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:22px;position:sticky;top:72px}
-.sum-title{font-size:.7rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
-.sum-game{display:flex;align-items:center;gap:12px;padding:14px;background:var(--s3);border-radius:var(--r);margin-bottom:18px}
-.sum-game-icon{font-size:2.2rem}
-.sum-gname{font-size:.95rem;font-weight:800}
-.sum-gsub{font-size:.75rem;color:var(--t2);margin-top:2px}
-.sum-rows{border-top:1px solid var(--b1);padding-top:14px}
-.sr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:.875rem}
-.sr .k{color:var(--t2)}
-.sr .v{font-weight:600;text-align:right;max-width:55%}
-.sr-divider{border:none;border-top:1px solid var(--b1);margin:6px 0}
-.sr.total .k{font-weight:700;color:var(--t1)}
-.sr.total .v{font-size:1.3rem;font-weight:900;color:var(--cyan)}
-.sr.disc .v{color:var(--green)}
+.summary-card{background:#131820;border:1px solid #1e2538;border-radius:14px;padding:18px;margin-bottom:14px}
+.sum-title{font-size:.7rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.sum-game{display:flex;align-items:center;gap:12px;background:#181f2e;border-radius:10px;padding:12px;margin-bottom:14px}
+.sum-icon{font-size:2rem}
+.sum-gname{font-weight:700;font-size:.9rem}
+.sum-gsub{font-size:.72rem;color:#94a3b8;margin-top:2px}
+.sum-row{display:flex;justify-content:space-between;padding:8px 0;font-size:.85rem;border-bottom:1px solid #1e2538}
+.sum-row:last-child{border-bottom:none}
+.sum-row .k{color:#94a3b8}
+.sum-row.total .k{color:#e2e8f0;font-weight:700}
+.sum-row.total .v{font-size:1.2rem;font-weight:900;color:#00d4ff}
+.sum-row.disc .v{color:#10b981}
+.pay-btn{width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;margin-top:14px;transition:.2s}
+.pay-btn:disabled{opacity:.4;cursor:not-allowed}
+.sec-note{text-align:center;font-size:.7rem;color:#475569;margin-top:10px}
 
-/* PAY BTN */
-.pay-btn{width:100%;margin-top:18px;padding:16px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;font-size:1rem;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.3px;box-shadow:0 4px 20px rgba(0,212,255,.2)}
-.pay-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,212,255,.35)}
-.pay-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.pay-btn.loading::after{content:' ⏳'}
-.security-note{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.72rem;color:var(--t3);margin-top:12px}
-
-/* PAYMENT MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+/* ===== MODAL SUKSES ===== */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.show{display:flex}
-.modal{background:var(--s1);border:1px solid var(--b1);border-radius:24px;width:100%;max-width:460px;overflow:hidden;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
-.modal-header{background:linear-gradient(135deg,var(--purple),var(--cyan));padding:24px;text-align:center}
-.modal-header .m-icon{font-size:2.8rem;margin-bottom:8px}
-.modal-header h2{font-size:1.3rem;font-weight:900;color:#fff}
-.modal-header p{font-size:.82rem;color:rgba(255,255,255,.75);margin-top:4px}
-.modal-body{padding:24px}
-
-/* QR PAY */
-.qr-box{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:20px;text-align:center;margin-bottom:20px}
-.qr-img{width:180px;height:180px;background:#fff;border-radius:12px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:4rem;padding:10px}
-.qr-timer{font-size:1.5rem;font-weight:900;color:var(--red);font-variant-numeric:tabular-nums}
-.qr-timer-lbl{font-size:.72rem;color:var(--t3);margin-top:2px}
-.qr-amount{font-size:1.4rem;font-weight:900;color:var(--cyan);margin:12px 0 4px}
-.qr-ref{font-size:.75rem;color:var(--t3);font-family:monospace}
-
-/* VA BOX */
-.va-box{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:20px;margin-bottom:20px}
-.va-bank{font-size:.78rem;color:var(--t2);margin-bottom:6px;font-weight:600}
-.va-num-row{display:flex;align-items:center;justify-content:space-between;background:var(--s3);border-radius:var(--r);padding:12px 14px}
-.va-num{font-size:1.2rem;font-weight:900;font-family:monospace;letter-spacing:2px}
-.copy-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;color:var(--cyan);padding:6px 12px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s}
-.copy-btn:hover{background:rgba(0,212,255,.2)}
-.va-amount{margin-top:14px;text-align:center}
-.va-amount .lbl{font-size:.78rem;color:var(--t2)}
-.va-amount .val{font-size:1.5rem;font-weight:900;color:var(--cyan)}
-.va-inst{font-size:.78rem;color:var(--t2);line-height:1.7;margin-top:14px;padding-top:14px;border-top:1px solid var(--b1)}
-.va-inst b{color:var(--t1)}
-
-/* STATUS STEPS */
-.status-steps{display:flex;flex-direction:column;gap:0;margin-bottom:20px}
-.ss{display:flex;gap:14px;align-items:flex-start;padding-bottom:16px;position:relative}
-.ss:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--b1)}
-.ss-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;position:relative;z-index:1}
-.ss-dot.done{background:var(--green);color:#fff}
-.ss-dot.active{background:var(--cyan);color:#000;animation:pulse 1.5s infinite}
-.ss-dot.wait{background:var(--s3);border:2px solid var(--b2);color:var(--t3)}
-.ss-info .title{font-size:.875rem;font-weight:700}
-.ss-info .sub{font-size:.75rem;color:var(--t3);margin-top:2px}
-
-.btn-full{width:100%;padding:14px;border-radius:var(--r);border:none;cursor:pointer;font-size:.9rem;font-weight:700;transition:.2s}
-.btn-outline{background:transparent;border:1px solid var(--b1);color:var(--t1)}
-.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;box-shadow:0 4px 16px rgba(0,212,255,.2)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,212,255,.35)}
-
-/* SUCCESS */
-.success-wrap{text-align:center;padding:10px 0}
-.s-icon{font-size:4rem;margin-bottom:14px;animation:bounce .5s ease}
-.s-title{font-size:1.4rem;font-weight:900;margin-bottom:8px}
-.s-sub{font-size:.875rem;color:var(--t2);line-height:1.6;margin-bottom:20px}
-.s-receipt{background:var(--s2);border-radius:var(--r2);padding:16px;text-align:left;margin-bottom:20px;font-size:.82rem}
-.s-r-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b1)}
-.s-r-row:last-child{border-bottom:none}
-.s-r-key{color:var(--t2)}
-.s-r-val{font-weight:700;color:var(--t1)}
-
-/* HISTORY PAGE */
-.hist-grid{display:flex;flex-direction:column;gap:12px}
-.h-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:18px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:.2s}
-.h-card:hover{border-color:var(--b2);background:var(--s3)}
-.h-icon{font-size:2.2rem;width:48px;text-align:center}
-.h-info{flex:1}
-.h-game{font-size:.95rem;font-weight:700}
-.h-item{font-size:.8rem;color:var(--t2);margin-top:2px}
-.h-date{font-size:.72rem;color:var(--t3);margin-top:4px}
-.h-right{text-align:right}
-.h-price{font-size:.95rem;font-weight:800;color:var(--cyan)}
-.h-status{display:inline-block;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:100px;margin-top:5px}
-.st-success{background:rgba(16,185,129,.15);color:var(--green)}
-.st-pending{background:rgba(245,158,11,.15);color:var(--gold)}
-.st-failed{background:rgba(239,68,68,.15);color:var(--red)}
-
-/* EMPTY */
-.empty-state{text-align:center;padding:60px 20px;color:var(--t3)}
-.empty-icon{font-size:3rem;margin-bottom:12px;opacity:.5}
-.empty-text{font-size:.9rem}
-
-/* ANIMATIONS */
-@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.4)}50%{box-shadow:0 0 0 8px rgba(0,212,255,0)}}
-@keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.2)}70%{transform:scale(.95)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin{display:inline-block;animation:spin .8s linear infinite}
+.modal{background:#131820;border:1px solid #1e2538;border-radius:20px;width:100%;max-width:420px;overflow:hidden}
+.modal-top{background:linear-gradient(135deg,#10b981,#059669);padding:28px;text-align:center}
+.modal-top .m-icon{font-size:3rem;margin-bottom:10px}
+.modal-top h2{color:#fff;font-size:1.3rem;font-weight:900}
+.modal-top p{color:rgba(255,255,255,.8);font-size:.82rem;margin-top:5px}
+.modal-body{padding:22px}
+.receipt-row{display:flex;justify-content:space-between;padding:8px 0;font-size:.82rem;border-bottom:1px solid #1e2538}
+.receipt-row:last-child{border-bottom:none}
+.receipt-row .k{color:#94a3b8}
+.receipt-row .v{font-weight:700}
+.order-id{background:#181f2e;border-radius:8px;padding:10px;font-family:monospace;font-size:.75rem;color:#00d4ff;text-align:center;margin:14px 0}
+.m-btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s}
+.m-btn-primary{background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff}
+.m-btn-outline{background:transparent;border:1px solid #1e2538;color:#94a3b8}
 
 /* TOAST */
-.toast-wrap{position:fixed;top:70px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--s1);border:1px solid var(--b1);border-radius:100px;padding:10px 20px;font-size:.82rem;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:slideIn .3s ease}
-.toast.t-ok{border-color:var(--green);color:var(--green)}
-.toast.t-err{border-color:var(--red);color:var(--red)}
-.toast.t-info{border-color:var(--cyan);color:var(--cyan)}
-@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-
-/* UTILS */
-.text-cyan{color:var(--cyan)}
-.text-green{color:var(--green)}
-.text-red{color:var(--red)}
-.text-gold{color:var(--gold)}
-.mt8{margin-top:8px}
-.mt16{margin-top:16px}
-.fw7{font-weight:700}
-.fs13{font-size:.82rem;color:var(--t2)}
+.toast-w{position:fixed;bottom:20px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:#0d1017;border-radius:100px;padding:8px 18px;font-size:.75rem;font-weight:600;border:1px solid #10b981;color:#10b981}
 </style>
 </head>
 <body>
-<div class="bg-fx"><span></span><span></span><span></span></div>
 
 <!-- NAV -->
 <nav>
-  <div class="logo" onclick="showPage('home')">Daffa<b>Store</b></div>
-  <div class="nav-menu">
-    <button class="active" onclick="showPage('home');setActive(this)">🏠 Home</button>
-    <button onclick="showPage('history');setActive(this)">📋 Riwayat</button>
-    <button onclick="showPage('promo');setActive(this)">🎁 Promo</button>
-    <button onclick="openCS()">💬 CS 24/7</button>
+  <div class="logo">Daffa<span>Store</span></div>
+  <button class="back-btn" onclick="goBack()">← Beranda</button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast-w" id="toastW"></div>
+
+<!-- ===== HALAMAN 1: PILIH GAME ===== -->
+<div class="page active" id="pg-games">
+  <div class="hero-small">
+    <h1>Pilih <span>Game</span></h1>
+    <p>Klik game yang ingin kamu top up</p>
   </div>
-  <div class="nav-right">
-    <div class="badge-car
+
+  <div class="search-wrap">
+    <input class="search-input" placeholder="🔍 Cari game..." oninput="filterGames(this.value)">
+  </div>
+
+  <div class="filter-wrap">
+    <div class="pill active" onclick="filterCat('all',this)">Semua</div>
+    <div class="pill" onclick="filterCat('MOBA',this)">MOBA</div>
+    <div class="pill" onclick="filterCat('Battle Royale',this)">Battle Royale</div>
+    <div class="pill" onclick="filterCat('RPG',this)">RPG</div>
+    <div class="pill" onclick="filterCat('FPS',this)">FPS</div>
+  </div>
+
+  <div class="game-grid" id="gameGrid"></div>
+</div>
+
+<!-- ===== HALAMAN 2: FORM TOPUP ===== -->
+<div class="page" id="pg-topup">
+  <div class="topup-wrap">
+
+    <!-- Game Header -->
+    <div class="game-header">
+      <div class="gh-icon" id="ghIcon">⚔️</div>
+      <div>
+        <div class="gh-name" id="ghName">Mobile Legends</div>
+        <div class="gh-cat" id="ghCat">MOBA</div>
+        <div class="gh-tag">✅ Proses Otomatis · Instan</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: AKUN -->
+    <div class="card">
+      <div class="step-head">
+        <div class="step-num">1</div>
+        <div><div class="step-title">Data Akun Game</div><div class="step-sub">Masukkan ID akun dengan benar</div></div>
+      </div>
+      <div class="fl">
+        <label>User ID <span style="color:#ef4444">*</span></label>
+        <input type="text" id="userId" placeholder="Masukkan User ID" oninput="onUIDInput(this.value)">
+      </div>
+      <div class="fl" id="serverGroup">
+        <label>Server ID</label>
+        <input type="text" id="serverId" placeholder="Contoh: 1234">
+      </div>
+      <div class="fl">
+        <label>Email Konfirmasi <span style="color:#ef4444">*</span></label>
+        <input type="email" id="emailInput" placeholder="email@kamu.com" oninput="updateSummary()">
+      </div>
+      <div class="verify-ok" id="verifyOk" style="display:none">
+        ✅ ID ditemukan — <span id="nickName">Nickname</span>
+      </div>
+    </div>
+
+    <!-- STEP 2: NOMINAL -->
+    <div class="card">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div><div class="step-title">Pilih Nominal</div><div class="step-sub" id="currLabel">Pilih jumlah Diamond</div></div>
+      </div>
+      <div class="nom-grid" id="nomGrid"></div>
+    </div>
+
+    <!-- STEP 3: PEMBAYARAN -->
+    <div class="card">
+      <div class="step-head">
+        <div class="step-num">3</div>
+        <div><div class="step-title">Metode Pembayaran</div><div class="step-sub">Pilih metode yang tersedia</div></div>
+      </div>
+      <div class="pay-grid">
+        <div class="pay-card" onclick="selPay(this,'QRIS')"><div class="pay-icon">📱</div><div><div class="pay-name">QRIS</div><div class="pay-desc">Semua e-wallet</div></div></div>
+        <div class="pay-card" onclick="selPay(this,'GoPay')"><div class="pay-icon">💚</div><div><div class="pay-name">GoPay</div><div class="pay-desc">Dompet digital</div></div></div>
+        <div class="pay-card" onclick="selPay(this,'OVO')"><div class="pay-icon">💜</div><div><div class="pay-name">OVO</div><div class="pay-desc">Dompet digital</div></div></div>
+        <div class="pay-card" onclick="selPay(this,'Dana')"><div class="pay-icon">🔵</div><div><div class="pay-name">Dana</div><div class="pay-desc">Dompet digital</div></div></div>
+        <div class="pay-card" onclick="selPay(this,'BCA')"><div class="pay-icon">🏦</div><div><div class="pay-name">BCA</div><div class="pay-desc">Virtual Account</div></div></div>
+        <div class="pay-card" onclick="selPay(this,'Mandiri')"><div class="pay-icon">🏦</div><div><div class="pay-name">Mandiri</div><div class="pay-desc">Virtual Account</div></div></div>
+      </div>
+    </div>
+
+    <!-- STEP 4: KUPON -->
+    <div class="card">
+      <div class="step-head">
+        <div class="step-num">4</div>
+        <div><div class="step-title">Kode Promo</div><div class="step-sub">Opsional — jika ada</div></div>
+      </div>
+      <div class="coupon-row">
+        <input class="coupon-input" id="couponInput" placeholder="Contoh: DAFFAML10" style="text-transform:uppercase">
+        <button class="coupon-btn" onclick="applyCoupon()">Terapkan</button>
+      </div>
+      <div class="coupon-ok" id="couponOk">🎉 Diskon <span id="discLabel"></span> berhasil!</div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-card">
+      <div class="sum-title">Ringkasan Pesanan</div>
+      <div class="sum-game">
+        <div class="sum-icon" id="sumIcon">🎮</div>
+        <div><div class="sum-gname" id="sumGName">—</div><div class="sum-gsub">Pilih game</div></div>
+      </div>
+      <div class="sum-row"><span class="k">User ID</span><span class="v" id="srUID">—</span></div>
+      <div class="sum-row"><span class="k">Nickname</span><span class="v" id="srNick">—</span></div>
+      <div class="sum-row"><span class="k">Item</span><span class="v" id="srItem">—</span></div>
+      <div class="sum-row"><span class="k">Pembayaran</span><span class="v" id="srPay">—</span></div>
+      <div class="sum-row"><span class="k">Biaya Admin</span><span class="v" style="color:#10b981">GRATIS</span></div>
+      <div class="sum-row disc" id="srDiscRow" style="display:none"><span class="k">Diskon Promo</span><span class="v" id="srDisc">-Rp 0</span></div>
+      <div class="sum-row total"><span class="k">TOTAL</span><span class="v" id="srTotal">Rp 0</span></div>
+      <button class="pay-btn" id="payBtn" disabled onclick="bayar()">🔒 Bayar Sekarang</button>
+      <div class="sec-note">🛡️ Transaksi aman · Powered by Midtrans</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL SUKSES -->
+<div class="modal-bg" id="successModal">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="m-icon">🎉</div>
+      <h2>Pembayaran Berhasil!</h2>
+      <p>Item sedang diproses ke akunmu</p>
+    </div>
+    <div class="modal-body">
+      <div class="order-id" id="modalOrderId">Order ID: —</div>
+      <div class="receipt-row"><span class="k">Game</span><span class="v" id="rcGame">—</span></div>
+      <div class="receipt-row"><span class="k">Item</span><span class="v" id="rcItem">—</span></div>
+      <div class="receipt-row"><span class="k">User ID</span><span class="v" id="rcUID">—</span></div>
+      <div class="receipt-row"><span class="k">Total</span><span class="v" style="color:#00d4ff" id="rcTotal">—</span></div>
+      <div class="receipt-row"><span class="k">Pembayaran</span><span class="v" id="rcPay">—</span></div>
+      <div class="receipt-row"><span class="k">Status</span><span class="v" style="color:#10b981">✅ Sukses</span></div>
+      <button class="m-btn m-btn-primary" onclick="closeSuccess()">Lihat Riwayat</button>
+      <button class="m-btn m-btn-outline" onclick="closeSuccess();showPage('pg-games')">Top Up Lagi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────
+const GAMES = [
+  {id:'ml',  name:'Mobile Legends', icon:'⚔️', cat:'MOBA',         curr:'Diamond',   badge:'hot',
+   nominals:[{a:86,p:19000},{a:172,p:38000},{a:257,p:57000,d:5},{a:344,p:76000},{a:514,p:111000,d:5},{a:706,p:152000},{a:1412,p:295000,d:8},{a:2195,p:455000},{a:3688,p:762000,d:10}]},
+  {id:'ff',  name:'Free Fire',       icon:'🔥', cat:'Battle Royale', curr:'Diamond',   badge:'hot',
+   nominals:[{a:70,p:14000},{a:140,p:28000},{a:355,p:69000,d:5},{a:720,p:139000,d:10},{a:1450,p:275000,d:12},{a:2180,p:409000,d:15}]},
+  {id:'pubg',name:'PUBG Mobile',     icon:'🪖', cat:'Battle Royale', curr:'UC',        badge:'',
+   nominals:[{a:60,p:17000},{a:325,p:82000,d:5},{a:660,p:162000,d:7},{a:1800,p:410000,d:10},{a:3850,p:820000,d:12}]},
+  {id:'gi',  name:'Genshin Impact',  icon:'🌟', cat:'RPG',           curr:'Crystal',   badge:'hot',
+   nominals:[{a:60,p:15000},{a:330,p:79000,d:5},{a:1090,p:249000,d:8},{a:2240,p:499000,d:10},{a:3880,p:849000,d:12}]},
+  {id:'hsr', name:'Honkai: Star Rail',icon:'🚂',cat:'RPG',           curr:'Oneiric',   badge:'new',
+   nominals:[{a:60,p:15000},{a:330,p:79000,d:5},{a:1090,p:249000,d:8},{a:2240,p:499000,d:10}]},
+  {id:'cod', name:'Call of Duty',    icon:'🎯', cat:'FPS',           curr:'CP',        badge:'',
+   nominals:[{a:80,p:15000},{a:400,p:68000},{a:800,p:130000,d:5},{a:2000,p:315000,d:8}]},
+  {id:'val', name:'Valorant',        icon:'🎮', cat:'FPS',           curr:'VP',        badge:'',
+   nominals:[{a:475,p:52000},{a:1000,p:100000},{a:2050,p:195000,d:5},{a:3650,p:340000,d:8}]},
+  {id:'rblx',name:'Roblox',          icon:'🟥', cat:'Lainnya',       curr:'Robux',     badge:'',
+   nominals:[{a:400,p:55000},{a:800,p:109000},{a:1700,p:219000,d:5},{a:4500,p:549000,d:10}]},
+];
+
+const COUPONS = [
+  {code:'DAFFAML10',disc:10,type:'pct',label:'10%',games:['ml']},
+  {code:'NEWUSER20',disc:20,type:'pct',label:'20%',games:'all'},
+  {code:'TOPUP5K',  disc:5000,type:'flat',label:'Rp 5.000',games:'all'},
+  {code:'FF15OFF',  disc:15,type:'pct',label:'15%',games:['ff']},
+  {code:'RAMADAN25',disc:25,type:'pct',label:'25%',games:'all'},
+];
+
+const NICKS = ['ShadowWarrior','DragonSlayer','NightHunter','StarBreaker','IronKnight','VoidWalker','DarkMage'];
+
+let state = {game:null, nominal:null, payment:null, uid:'', nick:'', coupon:null, disc:0};
+let curCat = 'all';
+
+// ── RENDER GAMES ──────────────────────────────
+function renderGames(search='') {
+  const grid = document.getElementById('gameGrid');
+  let list = GAMES.filter(g => {
+    const matchCat  = curCat==='all' || g.cat===curCat;
+    const matchSrch = !search || g.name.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSrch;
+  });
+  grid.innerHTML = list.map(g => `
+    <div class="g-card" onclick="selectGame('${g.id}')">
+      ${g.badge?`<div class="g-badge">${g.badge.toUpperCase()}</div>`:''}
+      <div class="g-icon">${g.icon}</div>
+      <div class="g-name">${g.name}</div>
+      <div class="g-cat">${g.cat}</div>
+    </div>`).join('');
+}
+
+function filterGames(q){ renderGames(q); }
+function filterCat(cat,el){
+  curCat=cat;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderGames(document.querySelector('.search-input').value);
+}
+
+// ── SELECT GAME ───────────────────────────────
+function selectGame(id) {
+  const g = GAMES.find(x=>x.id===id);
+  if(!g) return;
+  state = {game:g, nominal:null, payment:null, uid:'', nick:'', coupon:null, disc:0};
+
+  document.getElementById('ghIcon').textContent = g.icon;
+  document.getElementById('ghName').textContent = g.name;
+  document.getElementById('ghCat').textContent  = g.cat;
+  document.getElementById('currLabel').textContent = `Pilih jumlah ${g.curr}`;
+  document.getElementById('sumIcon').textContent   = g.icon;
+  document.getElementById('sumGName').textContent  = g.name;
+  document.getElementById('userId').value  = '';
+  document.getElementById('serverId').value= '';
+  document.getElementById('emailInput').value='';
+  document.getElementById('verifyOk').style.display='none';
+  document.getElementById('couponInput').value='';
+  document.getElementById('couponOk').classList.remove('show');
+  document.getElementById('srDiscRow').style.display='none';
+  document.getElementById('serverGroup').style.display = ['ml','gi','hsr'].includes(id)?'block':'none';
+
+  const grid = document.getElementById('nomGrid');
+  grid.innerHTML = g.nominals.map((n,i)=>`
+    <div class="nom-card" id="nom${i}" onclick="selNom(${i})">
+      ${n.d?`<div class="nom-disc">HEMAT ${n.d}%</div>`:''}
+      <div class="nom-check">✓</div>
+      <div class="nom-amt">${n.a.toLocaleString('id-ID')}</div>
+      <div class="nom-curr">${g.curr}</div>
+      <div class="nom-price">${rp(n.p)}</div>
+    </div>`).join('');
+
+  document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('sel'));
+  updateSummary();
+  showPage('pg-topup');
+}
+
+// ── NOMINAL ───────────────────────────────────
+function selNom(i){
+  document.querySelectorAll('.nom-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('nom'+i).classList.add('sel');
+  state.nominal = state.game.nominals[i];
+  if(state.coupon) applyCouponCalc();
+  updateSummary();
+}
+
+// ── PAYMENT ───────────────────────────────────
+function selPay(el,name){
+  document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  state.payment=name;
+  document.getElementById('srPay').textContent=name;
+  checkBtn();
+}
+
+// ── UID INPUT ─────────────────────────────────
+function onUIDInput(v){
+  state.uid = v.trim();
+  const ok = document.getElementById('verifyOk');
+  if(v.trim().length>=3){
+    state.nick = NICKS[Math.floor(Math.random()*NICKS.length)];
+    document.getElementById('nickName').textContent = state.nick;
+    ok.style.display='flex';
+    document.getElementById('srUID').textContent  = v.trim();
+    document.getElementById('srNick').textContent = state.nick;
+  } else {
+    ok.style.display='none';
+    document.getElementById('srUID').textContent  = '—';
+    document.getElementById('srNick').textContent = '—';
+  }
+  checkBtn();
+}
+
+// ── COUPON ────────────────────────────────────
+function applyCoupon(){
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const c = COUPONS.find(x=>x.code===code);
+  if(!c){ toast('Kode promo tidak valid ❌'); return; }
+  if(c.games!=='all' && state.game && !c.games.includes(state.game.id)){
+    toast('Promo tidak berlaku untuk game ini'); return; }
+  if(!state.nominal){ toast('Pilih nominal dulu ya'); return; }
+  state.coupon = c;
+  applyCouponCalc();
+  document.getElementById('discLabel').textContent = c.label;
+  document.getElementById('couponOk').classList.add('show');
+  toast('Promo berhasil diterapkan! 🎉');
+  updateSummary();
+}
+
+function applyCouponCalc(){
+  if(!state.coupon||!state.nominal) return;
+  const c=state.coupon, n=state.nominal;
+  state.disc = c.type==='pct' ? Math.round(n.p*c.disc/100) : Math.min(c.disc,n.p);
+}
+
+// ── SUMMARY ───────────────────────────────────
+function updateSummary(){
+  const n=state.nominal;
+  if(n){
+    document.getElementById('srItem').textContent = `${n.a.toLocaleString('id-ID')} ${state.game.curr}`;
+    const total = Math.max(0, n.p-state.disc);
+    document.getElementById('srTotal').textContent = rp(total);
+    if(state.disc>0){
+      document.getElementById('srDiscRow').style.display='flex';
+      document.getElementById('srDisc').textContent = '-'+rp(state.disc);
+    }
+  } else {
+    document.getElementById('srItem').textContent = '—';
+    document.getElementById('srTotal').textContent = 'Rp 0';
+  }
+  checkBtn();
+}
+
+function checkBtn(){
+  const uid   = document.getElementById('userId').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const ok    = uid.length>=3 && email.includes('@') && state.nominal && state.payment;
+  document.getElementById('payBtn').disabled = !ok;
+}
+
+// ── BAYAR ─────────────────────────────────────
+function bayar(){
+  const n     = state.nominal;
+  const total = Math.max(0, n.p-state.disc);
+  const oid   = 'DS-'+Date.now().toString(36).toUpperCase().slice(-6)+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+
+  document.getElementById('modalOrderId').textContent = 'Order ID: '+oid;
+  document.getElementById('rcGame').textContent  = state.game.name;
+  document.getElementById('rcItem').textContent  = `${n.a.toLocaleString('id-ID')} ${state.game.curr}`;
+  document.getElementById('rcUID').textContent   = state.uid;
+  document.getElementById('rcTotal').textContent = rp(total);
+  document.getElementById('rcPay').textContent   = state.payment;
+  document.getElementById('successModal').classList.add('show');
+
+  // Simpan ke riwayat
+  const hist = JSON.parse(localStorage.getItem('ds_hist')||'[]');
+  hist.unshift({oid,game:state.game.name,icon:state.game.icon,item:`${n.a} ${state.game.curr}`,price:total,pay:state.payment,uid:state.uid,date:new Date().toLocaleString('id-ID'),status:'SUCCESS'});
+  localStorage.setItem('ds_hist', JSON.stringify(hist.slice(0,50)));
+  toast('Top up berhasil! Item segera masuk 🎉');
+}
+
+function closeSuccess(){ document.getElementById('successModal').classList.remove('show'); }
+
+// ── NAV ───────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goBack(){
+  if(document.getElementById('pg-topup').classList.contains('active')){
+    showPage('pg-games');
+  } else {
+    window.location.href='index.html';
+  }
+}
+
+// ── UTILS ─────────────────────────────────────
+function rp(n){ return 'Rp '+n.toLocaleString('id-ID'); }
+function toast(msg){
+  const w=document.getElementById('toastW');
+  const d=document.createElement('div');
+  d.className='toast'; d.textContent=msg;
+  w.appendChild(d);
+  setTimeout(()=>d.remove(),3000);
+}
+
+// Init
+renderGames();
+</script>
+</body>
+</html>
