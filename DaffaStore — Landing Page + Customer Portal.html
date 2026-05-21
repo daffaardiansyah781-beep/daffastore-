@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DaffaStore — Top Up Game Termurah & Tercepat</title>
+<style>
+:root{
+  --bg:#06080e;--s1:#0c0f18;--s2:#111622;--s3:#161d2e;
+  --b1:#1a2235;--b2:#202840;
+  --cyan:#00d4ff;--purple:#7c3aed;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--pink:#ec4899;
+  --t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;
+  --grad:linear-gradient(135deg,var(--purple),var(--cyan));
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* ── BG FX ── */
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.5}
+.orb1{width:700px;height:700px;background:rgba(124,58,237,.08);top:-200px;right:-150px;animation:drift 20s ease-in-out infinite}
+.orb2{width:500px;height:500px;background:rgba(0,212,255,.06);bottom:-100px;left:-100px;animation:drift 25s ease-in-out infinite reverse}
+.orb3{width:400px;height:400px;background:rgba(236,72,153,.05);top:40%;left:35%;animation:drift 30s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translate(0,0)}33%{transform:translate(30px,-20px)}66%{transform:translate(-20px,30px)}}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,60px);background:rgba(6,8,14,0);backdrop-filter:blur(0px);border-bottom:1px solid transparent;transition:all .4s}
+nav.scrolled{background:rgba(6,8,14,.92);backdrop-filter:blur(24px);border-bottom-color:var(--b1)}
+.n-logo{font-size:1.3rem;font-weight:900;letter-spacing:-.5px;cursor:pointer;position:relative;z-index:1}
+.n-logo b{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.n-links{display:flex;gap:4px;position:relative;z-index:1}
+.n-links a{color:var(--t2);font-size:.875rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:.2s;text-decoration:none}
+.n-links a:hover{color:var(--t1);background:rgba(255,255,255,.05)}
+.n-right{display:flex;gap:10px;align-items:center;position:relative;z-index:1}
+.nbtn{padding:9px 20px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;border:none}
+.nbtn-ghost{background:transparent;border:1px solid var(--b2);color:var(--t2)}
+.nbtn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+.nbtn-main{background:var(--grad);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.3)}
+.nbtn-main:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(124,58,237,.45)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:100px 20px 60px;position:relative;z-index:1}
+.hero-inner{max-width:860px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.18);border-radius:100px;padding:7px 18px;font-size:.78rem;color:var(--cyan);font-weight:600;margin-bottom:28px;animation:fadeUp .8s ease}
+.hero-badge .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:livepulse 1.5s infinite}
+@keyframes livepulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(2.4rem,6vw,4.8rem);font-weight:900;line-height:1.08;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .9s ease}
+.hero h1 .line2{display:block;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:clamp(.95rem,2.2vw,1.15rem);color:var(--t2);line-height:1.75;max-width:600px;margin:0 auto 40px;animation:fadeUp 1s ease}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp 1.1s ease}
+.cta-main{padding:16px 36px;border-radius:14px;border:none;background:var(--grad);color:#fff;font-size:1rem;font-weight:800;cursor:pointer;transition:all .25s;box-shadow:0 8px 32px rgba(124,58,237,.35);letter-spacing:.3px}
+.cta-main:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(124,58,237,.5)}
+.cta-sec{padding:16px 36px;border-radius:14px;border:1px solid var(--b2);background:transparent;color:var(--t1);font-size:1rem;font-weight:700;cursor:pointer;transition:all .25s}
+.cta-sec:hover{border-color:var(--cyan);color:var(--cyan)}
+.hero-stats{display:flex;justify-content:center;gap:clamp(24px,5vw,60px);margin-top:56px;flex-wrap:wrap;animation:fadeUp 1.2s ease}
+.hs-item{text-align:center}
+.hs-val{font-size:2rem;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.hs-lbl{font-size:.72rem;color:var(--t3);margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── TICKER ── */
+.ticker-wrap{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(0,212,255,.05));border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);padding:12px 0;overflow:hidden;position:relative;z-index:1}
+.ticker{display:flex;gap:48px;animation:tickerAnim 35s linear infinite;width:max-content}
+.ti{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--t2);white-space:nowrap;font-weight:500}
+.ti .dot{width:6px;height:6px;background:var(--green);border-radius:50%;flex-shrink:0}
+@keyframes tickerAnim{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SECTION BASE ── */
+.section{padding:clamp(60px,10vw,110px) clamp(16px,5vw,60px);position:relative;z-index:1;max-width:1200px;margin:0 auto}
+.sec-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:100px;padding:5px 16px;font-size:.72rem;color:#a78bfa;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px}
+.sec-h{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;line-height:1.15;letter-spacing:-.8px;margin-bottom:14px}
+.sec-sub{font-size:clamp(.9rem,2vw,1.05rem);color:var(--t2);line-height:1.7;max-width:560px}
+
+/* ── FEATURES ── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:48px}
+.feat-card{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:28px;transition:all .3s;position:relative;overflow:hidden;cursor:default}
+.feat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(0,212,255,.02));opacity:0;transition:.3s}
+.feat-card:hover::before{opacity:1}
+.feat-card:hover{border-color:rgba(0,212,255,.25);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.3)}
+.feat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:18px}
+.feat-title{font-size:1.05rem;font-weight:800;margin-bottom:10px}
+.feat-desc{font-size:.85rem;color:var(--t2);line-height:1.7}
+.feat-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:14px}
+
+/* ── HOW ── */
+.how-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin-top:48px;position:relative}
+.how-wrap::before{content:'';position:absolute;top:24px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--b2),var(--b2),transparent);z-index:0}
+.how-card{text-align:center;padding:0 20px;position:relative;z-index:1}
+.how-num{width:48px;height:48px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;margin:0 auto 18px;box-shadow:0 4px 20px rgba(124,58,237,.4)}
+.how-title{font-size:.95rem;font-weight:800;margin-bottom:8px}
+.how-desc{font-size:.8rem;color:var(--t2);line-height:1.6}
+
+/* ── GAMES SHOWCASE ── */
+.games-scroll{display:flex;gap:14px;overflow-x:auto;padding:24px 0 8px;scrollbar-width:none;margin-top:32px}
+.games-scroll::-webkit-scrollbar{display:none}
+.gs-card{background:var(--s2);border:1px solid var(--b1);border-radius:18px;padding:20px 18px;text-align:center;min-width:140px;cursor:pointer;transition:all .25s;flex-shrink:0}
+.gs-card:hover{border-color:rgba(0,212,255,.35);transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,212,255,.1)}
+.gs-card.active{border-color:var(--cyan);background:rgba(0,212,255,.06)}
+.gs-icon{font-size:2.2rem;margin-bottom:10px}
+.gs-name{font-size:.8rem;font-weight:700;margin-bottom:4px}
+.gs-price{font-size:.72rem;color:var(--cyan);font-weight:600}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:48px}
+.testi-card{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:24px;transition:.3s}
+.testi-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.testi-stars{color:var(--gold);font-size:1rem;letter-spacing:2px;margin-bottom:12px}
+.testi-text{font-size:.875rem;color:var(--t2);line-height:1.7;margin-bottom:18px;font-style:italic}
+.testi-user{display:flex;align-items:center;gap:10px}
+.testi-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;color:#fff;flex-shrink:0}
+.testi-name{font-weight:700;font-size:.85rem}
+.testi-game{font-size:.72rem;color:var(--t3)}
+
+/* ── FAQ ── */
+.faq-list{margin-top:40px;display:flex;flex-direction:column;gap:10px}
+.faq-item{background:var(--s2);border:1px solid var(--b1);border-radius:14px;overflow:hidden;transition:.2s}
+.faq-item:hover{border-color:var(--b2)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;font-size:.9rem;font-weight:700;gap:12px}
+.faq-arrow{font-size:.75rem;transition:transform .3s;color:var(--t3);flex-shrink:0}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--cyan)}
+.faq-item.open .faq-q{color:var(--cyan)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-item.open .faq-a{max-height:300px}
+.faq-a-inner{padding:0 22px 18px;font-size:.85rem;color:var(--t2);line-height:1.75;border-top:1px solid var(--b1)}
+
+/* ── PROMO BANNER ── */
+.promo-section{padding:clamp(40px,6vw,80px) clamp(16px,5vw,60px);position:relative;z-index:1}
+.promo-banner{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(0,212,255,.1));border:1px solid rgba(0,212,255,.15);border-radius:24px;padding:clamp(28px,5vw,48px);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.promo-banner::before{content:'🎉';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-size:8rem;opacity:.06;pointer-events:none}
+.pb-left h2{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;margin-bottom:8px}
+.pb-left p{color:var(--t2);font-size:.9rem;line-height:1.6}
+.promo-codes{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.pc-item{background:rgba(0,212,255,.08);border:1px dashed rgba(0,212,255,.3);border-radius:10px;padding:10px 18px;cursor:pointer;transition:.2s}
+.pc-item:hover{background:rgba(0,212,255,.15)}
+.pc-code{font-family:monospace;font-size:1rem;font-weight:900;color:var(--cyan);letter-spacing:2px}
+.pc-desc{font-size:.7rem;color:var(--t2);margin-top:3px}
+
+/* ── CTA SECTION ── */
+.cta-section{text-align:center;padding:clamp(60px,10vw,100px) 20px;position:relative;z-index:1}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(124,58,237,.15),transparent 70%);pointer-events:none}
+
+/* ── PORTAL (AUTH) ── */
+.portal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.portal-overlay.show{display:flex}
+.portal-box{background:var(--s1);border:1px solid var(--b1);border-radius:24px;width:100%;max-width:420px;overflow:hidden;animation:popUp .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popUp{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.portal-tabs{display:flex;background:var(--s2);border-bottom:1px solid var(--b1)}
+.portal-tab{flex:1;padding:14px;text-align:center;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;transition:.2s}
+.portal-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.portal-body{padding:28px}
+.pf{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.pf label{font-size:.78rem;color:var(--t2);font-weight:600}
+.pf input{background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;color:var(--t1);font-size:.9rem;outline:none;transition:.2s;width:100%}
+.pf input:focus{border-color:var(--cyan);background:var(--s2)}
+.pf input::placeholder{color:var(--t3)}
+.p-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--grad);color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;margin-top:6px;transition:.2s;letter-spacing:.3px;box-shadow:0 4px 20px rgba(124,58,237,.3)}
+.p-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(124,58,237,.45)}
+.p-divider{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:.75rem;margin:16px 0}
+.p-divider::before,.p-divider::after{content:'';flex:1;height:1px;background:var(--b1)}
+.social-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.s-btn{padding:11px;border:1px solid var(--b2);border-radius:10px;background:var(--s3);color:var(--t1);font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.s-btn:hover{border-color:var(--b3);background:var(--s2)}
+.p-close-btn{position:absolute;top:14px;right:14px;background:var(--s3);border:1px solid var(--b1);border-radius:50%;width:30px;height:30px;color:var(--t2);cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.p-close-btn:hover{color:var(--red)}
+
+/* ── DASHBOARD PORTAL ── */
+.dash-portal{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column;animation:fadeIn .3s ease}
+.dash-portal.show{display:flex}
+.dp-nav{height:56px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,40px);flex-shrink:0}
+.dp-user{display:flex;align-items:center;gap:10px}
+.dp-avatar{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800}
+.dp-name{font-weight:700;font-size:.9rem}
+.dp-email{font-size:.72rem;color:var(--t3)}
+.dp-tabs{display:flex;gap:4px}
+.dp-tab{padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;color:var(--t2);background:none;border:none;transition:.2s}
+.dp-tab.active,.dp-tab:hover{color:var(--t1);background:var(--s3)}
+.dp-content{flex:1;overflow-y:auto;padding:clamp(20px,4vw,40px)}
+.dp-section{display:none}.dp-section.active{display:block}
+
+/* POINTS CARD */
+.points-banner{background:linear-gradient(135deg,var(--purple),var(--cyan));border-radius:20px;padding:clamp(20px,4vw,32px);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.pb-val{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1}
+.pb-lbl{font-size:.8rem;opacity:.8;margin-top:4px}
+.points-actions{display:flex;gap:10px;flex-wrap:wrap}
+.pa-btn{padding:10px 20px;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;border:none}
+.pa-btn-white{background:rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(4px)}
+.pa-btn-white:hover{background:rgba(255,255,255,.3)}
+.pa-btn-solid{background:#fff;color:var(--purple)}
+.pa-btn-solid:hover{transform:translateY(-1px)}
+
+/* STATS MINI */
+.mini-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.ms-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px}
+.ms-val{font-size:1.5rem;font-weight:900;color:var(--cyan);margin-bottom:4px}
+.ms-lbl{font-size:.75rem;color:var(--t3)}
+
+/* ORDER HISTORY */
+.order-list{display:flex;flex-direction:column;gap:10px}
+.ol-item{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s}
+.ol-item:hover{border-color:var(--b2);background:var(--s3)}
+.ol-icon{font-size:1.8rem;width:42px;text-align:center}
+.ol-info{flex:1}
+.ol-game{font-weight:700;font-size:.9rem}
+.ol-item-name{font-size:.75rem;color:var(--t2);margin-top:2px}
+.ol-date{font-size:.68rem;color:var(--t3);margin-top:3px}
+.ol-right{text-align:right}
+.ol-price{font-weight:800;font-size:.9rem;color:var(--cyan)}
+.ol-status{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;margin-top:4px;display:inline-block}
+.st-ok{background:rgba(16,185,129,.12);color:var(--green)}
+.st-pend{background:rgba(245,158,11,.12);color:var(--gold)}
+.st-fail{background:rgba(239,68,68,.12);color:var(--red)}
+
+/* REFERRAL */
+.ref-card{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:24px;margin-bottom:16px}
+.ref-code-box{background:var(--s3);border:1px dashed rgba(0,212,255,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0}
+.ref-code{font-family:monospace;font-size:1.3rem;font-weight:900;color:var(--cyan);letter-spacing:3px}
+.ref-copy{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:8px;color:var(--cyan);padding:7px 14px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s}
+.ref-copy:hover{background:rgba(0,212,255,.2)}
+.ref-steps{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.rs-item{flex:1;min-width:140px;background:var(--s3);border-radius:12px;padding:14px;text-align:center}
+.rs-icon{font-size:1.5rem;margin-bottom:8px}
+.rs-title{font-size:.8rem;font-weight:700;margin-bottom:4px}
+.rs-desc{font-size:.72rem;color:var(--t2)}
+.ref-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:16px}
+.ref-table th{text-align:left;padding:8px 12px;background:var(--s3);color:var(--t3);font-size:.68rem;font-weight:700;text-transform:uppercase}
+.ref-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+
+/* VOUCHER */
+.voucher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px}
+.vc-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;position:relative;overflow:hidden;cursor:pointer;transition:.2s}
+.vc-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.vc-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:rgba(255,255,255,.02);border-radius:50%;transform:translate(20px,-20px)}
+.vc-pts{font-size:1.3rem;font-weight:900;color:var(--gold);margin-bottom:4px}
+.vc-name{font-size:.9rem;font-weight:700;margin-bottom:6px}
+.vc-desc{font-size:.75rem;color:var(--t2);line-height:1.5}
+.vc-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:10px}
+
+/* PROFILE */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.profile-grid{grid-template-columns:1fr}}
+.prof-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:20px}
+.prof-title{font-size:.85rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.pf2{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.pf2 label{font-size:.72rem;color:var(--t3);font-weight:600}
+.pf2 input{background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;color:var(--t1);font-size:.85rem;outline:none;transition:.2s;width:100%}
+.pf2 input:focus{border-color:var(--cyan)}
+.save-btn{padding:10px 20px;border-radius:10px;border:none;background:var(--grad);color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s}
+.save-btn:hover{opacity:.9}
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b1)}
+.notif-row:last-child{border-bottom:none}
+.notif-label{font-size:.82rem}
+.notif-sub{font-size:.72rem;color:var(--t3);margin-top:2px}
+.toggle{width:38px;height:22px;background:var(--b2);border-radius:100px;cursor:pointer;transition:.3s;position:relative;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle.on::after{left:19px}
+
+/* ── FOOTER ── */
+footer{background:var(--s1);border-top:1px solid var(--b1);padding:clamp(40px,6vw,70px) clamp(16px,5vw,60px) 30px;position:relative;z-index:1}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr}}
+.footer-brand .f-logo{font-size:1.2rem;font-weight:900;margin-bottom:12px}
+.footer-brand .f-logo b{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.footer-brand p{font-size:.82rem;color:var(--t3);line-height:1.7;max-width:240px}
+.f-socials{display:flex;gap:8px;margin-top:16px}
+.f-social{width:34px;height:34px;border-radius:8px;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:.2s}
+.f-social:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.f-col h4{font-size:.78rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.f-col a{display:block;font-size:.82rem;color:var(--t2);text-decoration:none;margin-bottom:9px;transition:.2s;cursor:pointer}
+.f-col a:hover{color:var(--cyan)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--b1);padding-top:24px;flex-wrap:wrap;gap:12px}
+.fb-copy{font-size:.75rem;color:var(--t3)}
+.fb-pay{display:flex;gap:8px;align-items:center}
+.pay-icon{background:var(--s3);border:1px solid var(--b2);border-radius:6px;padding:4px 10px;font-size:.72rem;color:var(--t2);font-weight:600}
+
+/* TOAST */
+.toast-w{position:fixed;bottom:24px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--s1);border:1px solid var(--b1);border-radius:100px;padding:9px 18px;font-size:.78rem;font-weight:600;animation:slideR .3s ease;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.info{border-color:var(--cyan);color:var(--cyan)}
+.toast.err{border-color:var(--red);color:var(--red)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@media(max-width:640px){.n-links{display:none}.hero-cta{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+<div class="bg-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+<div class="toast-w" id="toastW"></div>
+
+<!-- ══ NAV ══ -->
+<nav id="mainNav">
+  <div class="n-logo" onclick="scrollToTop()">Daffa<b>Store</b></div>
+  <div class="n-links">
+    <a onclick="scrollSec('features')">Fitur</a>
+    <a onclick="scrollSec('games')">Game</a>
+    <a onclick="scrollSec('promo')">Promo</a>
+    <a onclick="scrollSec('faq')">FAQ</a>
+  </div>
+  <div class="n-right">
+    <button class="nbtn nbtn-ghost" onclick="openPortal('login')">Masuk</button>
+    <button class="nbtn nbtn-main" onclick="openPortal('register')">Daftar Gratis</button>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><div class="live-dot"></div>⚡ Proses Otomatis · Instan &lt;30 Detik · 24/7 Online</div>
+    <h1>Top Up Game Favorit<span class="line2">Lebih Cepat, Lebih Murah</span></h1>
+    <p class="hero-desc">Platform top up game terpercaya #1 Indonesia. Harga termurah, proses otomatis instan, dan layanan pelanggan siap membantu kapan saja.</p>
+    <div class="hero-cta">
+      <button class="cta-main" onclick="scrollSec('games')">🎮 Top Up Sekarang</button>
+      <button class="cta-sec" onclick="openPortal('register')">Daftar & Dapat Bonus →</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hs-item"><div class="hs-val" id="c1">0</div><div class="hs-lbl">Transaksi Sukses</div></div>
+      <div class="hs-item"><div class="hs-val" id="c2">0</div><div class="hs-lbl">Game Tersedia</div></div>
+      <div class="hs-item"><div class="hs-val" id="c3">0s</div><div class="hs-lbl">Rata-rata Proses</div></div>
+      <div class="hs-item"><div class="hs-val" id="c4">0</div><div class="hs-lbl">Pengguna Aktif</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TICKER ══ -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker"></div>
+</div>
+
+<!-- ══ FEATURES ══ -->
+<div class="section" id="features">
+  <div class="sec-tag">✨ Keunggulan</div>
+  <div class="sec-h">Kenapa Pilih <span style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">DaffaStore?</span></div>
+  <div class="sec-sub">Kami menghadirkan pengalaman top up terbaik dengan teknologi otomatis yang handal</div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(0,212,255,.1)">⚡</div>
+      <div class="feat-title">Proses Instan Otomatis</div>
+      <div class="feat-desc">Top up diproses secara otomatis tanpa campur tangan manual. Item masuk ke akunmu dalam hitungan detik setelah pembayaran dikonfirmasi.</div>
+      <span class="feat-badge" style="background:rgba(16,185,129,.12);color:var(--green)">&lt;30 detik rata-rata</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(124,58,237,.1)">💰</div>
+      <div class="feat-title">Harga Paling Kompetitif</div>
+      <div class="feat-desc">Kami bermitra langsung dengan supplier resmi sehingga bisa memberikan harga terbaik. Bandingkan sendiri — dijamin tidak ada yang lebih murah.</div>
+      <span class="feat-badge" style="background:rgba(245,158,11,.12);color:var(--gold)">Hemat hingga 15%</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(16,185,129,.1)">🛡️</div>
+      <div class="feat-title">100% Aman & Terpercaya</div>
+      <div class="feat-desc">Pembayaran diproses oleh Midtrans — payment gateway berlisensi Bank Indonesia. Data kamu terenkripsi SSL dan tidak pernah kami simpan.</div>
+      <span class="feat-badge" style="background:rgba(0,212,255,.1);color:var(--cyan)">SSL + Midtrans</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(236,72,153,.1)">🎁</div>
+      <div class="feat-title">Poin Reward & Referral</div>
+      <div class="feat-desc">Setiap transaksi menghasilkan poin yang bisa ditukar diskon. Ajak teman dan dapatkan komisi hingga 5% dari setiap pembelian mereka selamanya.</div>
+      <span class="feat-badge" style="background:rgba(236,72,153,.12);color:var(--pink)">Komisi 5%</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(245,158,11,.1)">💳</div>
+      <div class="feat-title">12+ Metode Pembayaran</div>
+      <div class="feat-desc">QRIS, GoPay, OVO, Dana, ShopeePay, Transfer Bank (BCA/BNI/BRI/Mandiri), Alfamart, Indomaret — bayar sesuka kamu.</div>
+      <span class="feat-badge" style="background:rgba(245,158,11,.12);color:var(--gold)">12 metode</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(59,130,246,.1)">🎧</div>
+      <div class="feat-title">CS Aktif 24 Jam</div>
+      <div class="feat-desc">Ada masalah dengan order? Tim customer service kami siap membantu 24/7 via WhatsApp dan live chat. Rata-rata respon kurang dari 5 menit.</div>
+      <span class="feat-badge" style="background:rgba(59,130,246,.12);color:#60a5fa">Respon &lt;5 menit</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOW ══ -->
+<div class="section" style="text-align:center">
+  <div class="sec-tag" style="margin:0 auto 16px">🗺️ Cara Kerja</div>
+  <div class="sec-h">Top Up dalam 3 Langkah Mudah</div>
+  <div class="how-wrap">
+    <div class="how-card"><div class="how-num">1</div><div class="how-title">Pilih Game & Nominal</div><div class="how-desc">Pilih game favoritmu dan nominal yang diinginkan dari katalog lengkap kami</div></div>
+    <div class="how-card"><div class="how-num">2</div><div class="how-title">Masukkan ID & Bayar</div><div class="how-desc">Input User ID game kamu, pilih metode pembayaran, lalu selesaikan transaksi</div></div>
+    <div class="how-card"><div class="how-num">3</div><div class="how-title">Item Masuk Otomatis</div><div class="how-desc">Item langsung terkirim ke akun game kamu. Konfirmasi via email otomatis dikirim</div></div>
+  </div>
+</div>
+
+<!-- ══ GAMES ══ -->
+<div class="section" id="games">
+  <div class="sec-tag">🎮 Game Tersedia</div>
+  <div class="sec-h">30+ Game Populer</div>
+  <div class="sec-sub">Dari MOBA, Battle Royale, RPG, hingga FPS — semua tersedia</div>
+  <div class="games-scroll" id="gamesScroll"></div>
+  <div style="text-align:center;margin-top:24px">
+    <button class="cta-main" style="font-size:.875rem;padding:13px 28px" onclick="scrollSec('topup')">Lihat Semua Game & Mulai Top Up →</button>
+  </div>
+</div>
+
+<!-- ══ PROMO ══ -->
+<div class="promo-section" id="promo">
+  <div class="promo-banner">
+    <div class="pb-left">
+      <h2>🎉 Promo Spesial Aktif!</h2>
+      <p>Gunakan kode promo di bawah untuk mendapatkan diskon eksklusif. Klik kode untuk menyalin.</p>
+      <div class="promo-codes">
+        <div class="pc-item" onclick="copyPromo('DAFFAML10')"><div class="pc-code">DAFFAML10</div><div class="pc-desc">Diskon 10% Diamond ML</div></div>
+        <div class="pc-item" onclick="copyPromo('NEWUSER20')"><div class="pc-code">NEWUSER20</div><div class="pc-desc">Diskon 20% user baru</div></div>
+        <div class="pc-item" onclick="copyPromo('TOPUP5K')"><div class="pc-code">TOPUP5K</div><div class="pc-desc">Potongan Rp 5.000</div></div>
+        <div class="pc-item" onclick="copyPromo('RAMADAN25')"><div class="pc-code">RAMADAN25</div><div class="pc-desc">Diskon 25% semua game</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TESTIMONIALS ══ -->
+<div class="section">
+  <div class="sec-tag">💬 Testimoni</div>
+  <div class="sec-h">Dipercaya 150.000+ Gamer</div>
+  <div class="testi-grid" id="testiGrid"></div>
+</div>
+
+<!-- ══ FAQ ══ -->
+<div class="section" id="faq" style="max-width:760px">
+  <div class="sec-tag">❓ FAQ</div>
+  <div class="sec-h">Pertanyaan Umum</div>
+  <div class="faq-list" id="faqList"></div>
+</div>
+
+<!-- ══ CTA ══ -->
+<div class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="sec-tag" style="margin:0 auto 20px">🚀 Mulai Sekarang</div>
+  <div class="sec-h" style="max-width:600px;margin:0 auto 16px">Siap Top Up dengan Harga Terbaik?</div>
+  <p style="color:var(--t2);font-size:.95rem;margin-bottom:32px">Daftar gratis dan dapatkan 500 poin bonus untuk top up pertamamu</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+    <button class="cta-main" onclick="openPortal('register')">🎁 Daftar & Klaim Bonus</button>
+    <button class="cta-sec" onclick="scrollSec('games')">Lihat Game →</button>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="f-logo">Daffa<b>Store</b></div>
+      <p>Platform top up game terpercaya #1 Indonesia. Proses instan, harga termurah, dan layanan 24 jam.</p>
+      <div class="f-socials">
+        <div class="f-social" onclick="toast('Instagram @daffastore','info')">📸</div>
+        <div class="f-social" onclick="toast('TikTok @daffastore','info')">🎵</div>
+        <div class="f-social" onclick="toast('WhatsApp CS','info')">💬</div>
+        <div class="f-social" onclick="toast('Discord Server','info')">🎮</div>
+      </div>
+    </div>
+    <div class="f-col">
+      <h4>Layanan</h4>
+      <a>Top Up Game</a><a>Kupon Promo</a><a>Poin Reward</a><a>Program Referral</a>
+    </div>
+    <div class="f-col">
+      <h4>Bantuan</h4>
+      <a>Cara Top Up</a><a>Cek Status Order</a><a>Hubungi CS</a><a>Kebijakan Refund</a>
+    </div>
+    <div class="f-col">
+      <h4>Perusahaan</h4>
+      <a>Tentang Kami</a><a>Syarat & Ketentuan</a><a>Kebijakan Privasi</a><a>Karir</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="fb-copy">© 2025 DaffaStore. All rights reserved.</div>
+    <div class="fb-pay">
+      <div class="pay-icon">QRIS</div><div class="pay-icon">GoPay</div>
+      <div class="pay-icon">OVO</div><div class="pay-icon">Dana</div>
+      <div class="pay-icon">BCA</div><div class="pay-icon">Midtrans</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ AUTH PORTAL ══ -->
+<div class="portal-overlay" id="portalOverlay" onclick="handlePortalClick(event)">
+  <div style="position:relative;width:100%;max-width:420px">
+    <button class="p-close-btn" onclick="closePortal()">✕</button>
+    <div class="portal-box">
+      <div class="portal-tabs">
+        <div class="portal-tab active" id="tab-login" onclick="switchTab('login')">Masuk</div>
+        <div class="portal-tab" id="tab-register" onclick="switchTab('register')">Daftar</div>
+      </div>
+      <div class="portal-body">
+
+        <!-- LOGIN -->
+        <div id="form-login">
+          <div class="pf"><label>Email</label><input type="email" id="loginEmail" placeholder="email@kamu.com"></div>
+          <div class="pf"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+          <div style="text-align:right;font-size:.75rem;color:var(--cyan);cursor:pointer;margin:-8px 0 12px">Lupa password?</div>
+          <button class="p-btn" onclick="doLogin()">Masuk ke Akun</button>
+          <div class="p-divider">atau lanjutkan dengan</div>
+          <div class="social-btns">
+            <button class="s-btn" onclick="socialLogin('Google')">🔵 Google</button>
+            <button class="s-btn" onclick="socialLogin('Facebook')">🔷 Facebook</button>
+          </div>
+          <div style="text-align:center;font-size:.75rem;color:var(--t3);margin-top:16px">Demo: <b style="color:var(--t2)">user@demo.com</b> / <b style="color:var(--t2)">demo123</b></div>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="form-register" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="pf"><label>Nama Depan</label><input type="text" id="regFirst" placeholder="Daffa"></div>
+            <div class="pf"><label>Nama Belakang</label><input type="text" id="regLast" placeholder="Putra"></div>
+          </div>
+          <div class="pf"><label>Email</label><input type="email" id="regEmail" placeholder="email@kamu.com"></div>
+          <div class="pf"><label>Nomor WhatsApp</label><input type="tel" id="regPhone" placeholder="08xxxxxxxxxx"></div>
+          <div class="pf"><label>Password</label><input type="password" id="regPass" placeholder="Min. 8 karakter"></div>
+          <div class="pf"><label>Kode Referral (opsional)</label><input type="text" id="regRef" placeholder="Isi jika dapat dari teman"></div>
+          <button class="p-btn" onclick="doRegister()">🎁 Daftar & Klaim 500 Poin</button>
+          <div style="font-size:.72rem;color:var(--t3);text-align:center;margin-top:12px;line-height:1.5">Dengan mendaftar, kamu menyetujui <span style="color:var(--cyan)">Syarat & Ketentuan</span> dan <span style="color:var(--cyan)">Kebijakan Privasi</span> kami</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CUSTOMER DASHBOARD ══ -->
+<div class="dash-portal" id="dashPortal">
+  <div class="dp-nav">
+    <div class="dp-user">
+      <div class="dp-avatar" id="dpAvatar">D</div>
+      <div><div class="dp-name" id="dpName">Daffa Putra</div><div class="dp-email" id="dpEmail">user@demo.com</div></div>
+    </div>
+    <div class="dp-tabs">
+      <button class="dp-tab active" onclick="dpTab('home',this)">🏠 Beranda</button>
+      <button class="dp-tab" onclick="dpTab('orders',this)">📋 Order</button>
+      <button class="dp-tab" onclick="dpTab('referral',this)">🔗 Referral</button>
+      <button class="dp-tab" onclick="dpTab('voucher',this)">🎁 Voucher</button>
+      <button class="dp-tab" onclick="dpTab('profile',this)">⚙️ Profil</button>
+    </div>
+    <button style="background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--t2);padding:7px 14px;font-size:.78rem;cursor:pointer;transition:.2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--t2)'" onclick="doLogout()">Keluar</button>
+  </div>
+
+  <div class="dp-content">
+
+    <!-- HOME -->
+    <div class="dp-section active" id="dp-home">
+      <div class="points-banner">
+        <div>
+          <div style="font-size:.82rem;opacity:.75;margin-bottom:8px">💎 Total Poin Kamu</div>
+          <div class="pb-val" id="userPoints">1.250</div>
+          <div class="pb-lbl">≈ Rp 12.500 nilai diskon</div>
+        </div>
+        <div class="points-actions">
+          <button class="pa-btn pa-btn-white" onclick="dpTab('voucher',null)">🎁 Tukar Poin</button>
+          <button class="pa-btn pa-btn-solid" onclick="toast('Buka toko → top up sekarang!','info')">⚡ Top Up Sekarang</button>
+        </div>
+      </div>
+      <div class="mini-stats">
+        <div class="ms-card"><div class="ms-val" id="ms1">0</div><div class="ms-lbl">Total Order</div></div>
+        <div class="ms-card"><div class="ms-val" id="ms2">Rp 0</div><div class="ms-lbl">Total Pengeluaran</div></div>
+        <div class="ms-card"><div class="ms-val" id="ms3">0</div><div class="ms-lbl">Teman Direferral</div></div>
+        <div class="ms-card"><div class="ms-val" id="ms4">0</div><div class="ms-lbl">Voucher Aktif</div></div>
+      </div>
+      <div style="font-size:.875rem;font-weight:800;margin-bottom:12px">🕐 Order Terbaru</div>
+      <div class="order-list" id="homeOrderList"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="dp-section" id="dp-orders">
+      <div style="font-size:1.1rem;font-weight:900;margin-bottom:20px">📋 Riwayat Order</div>
+      <div class="order-list" id="fullOrderList"></div>
+    </div>
+
+    <!-- REFERRAL -->
+    <div class="dp-section" id="dp-referral">
+      <div style="font-size:1.1rem;font-weight:900;margin-bottom:20px">🔗 Program Referral</div>
+      <div class="ref-card">
+        <div style="font-size:.875rem;font-weight:800;margin-bottom:6px">Kode Referral Kamu</div>
+        <div style="font-size:.8rem;color:var(--t2);margin-bottom:0">Bagikan kode ini ke teman. Kamu dapat <b style="color:var(--cyan)">5% komisi</b> dari setiap transaksi mereka selamanya!</div>
+        <div class="ref-code-box">
+          <div class="ref-code" id="userRefCode">DAFFA2025</div>
+          <button class="ref-copy" onclick="copyRefCode()">📋 Salin</button>
+        </div>
+        <div style="font-size:.78rem;color:var(--t2);margin-bottom:12px">Link referral: <span style="color:var(--cyan)" id="refLink">https://daffastore.com?ref=DAFFA2025</span></div>
+        <div class="ref-steps">
+          <div class="rs-item"><div class="rs-icon">🔗</div><div class="rs-title">Bagikan Kode</div><div class="rs-desc">Share ke teman atau sosmed</div></div>
+          <div class="rs-item"><div class="rs-icon">✅</div><div class="rs-title">Teman Daftar</div><div class="rs-desc">Mereka daftar & top up</div></div>
+          <div class="rs-item"><div class="rs-icon">💰</div><div class="rs-title">Dapat Komisi</div><div class="rs-desc">5% masuk saldo kamu</div></div>
+        </div>
+      </div>
+      <div class="ref-card">
+        <div style="font-size:.875rem;font-weight:800;margin-bottom:14px">📊 Statistik Referral</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+          <div style="background:var(--s3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:var(--cyan)">12</div><div style="font-size:.72rem;color:var(--t3)">Teman Diundang</div></div>
+          <div style="background:var(--s3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:var(--green)">Rp 87rb</div><div style="font-size:.72rem;color:var(--t3)">Total Komisi</div></div>
+          <div style="background:var(--s3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:var(--gold)">Rp 12rb</div><div style="font-size:.72rem;color:var(--t3)">Bulan Ini</div></div>
+        </div>
+        <table class="ref-table">
+          <tr><th>Teman</th><th>Bergabung</th><th>Total Order</th><th>Komisi</th></tr>
+          <tr><td>rizky***@gmail.com</td><td>3 hari lalu</td><td>5</td><td style="color:var(--green)">Rp 12.500</td></tr>
+          <tr><td>ayu***@gmail.com</td><td>1 minggu lalu</td><td>12</td><td style="color:var(--green)">Rp 31.000</td></tr>
+          <tr><td>bima***@yahoo.com</td><td>2 minggu lalu</td><td>8</td><td style="color:var(--green)">Rp 22.500</td></tr>
+          <tr><td>sari***@gmail.com</td><td>3 minggu lalu</td><td>4</td><td style="color:var(--green)">Rp 8.500</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- VOUCHER -->
+    <div class="dp-section" id="dp-voucher">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:1.1rem;font-weight:900">🎁 Tukar Poin & Voucher</div>
+        <div style="background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:8px 16px;font-size:.8rem">💎 Poin kamu: <b style="color:var(--cyan)" id="vcPoints">1.250</b></div>
+      </div>
+      <div class="voucher-grid" id="voucherGrid"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="dp-section" id="dp-profile">
+      <div style="font-size:1.1rem;font-weight:900;margin-bottom:20px">⚙️ Pengaturan Profil</div>
+      <div class="profile-grid">
+        <div class="prof-card">
+          <div class="prof-title">👤 Data Pribadi</div>
+          <div class="pf2"><label>Nama Lengkap</label><input id="profName" value="Daffa Putra"></div>
+          <div class="pf2"><label>Email</label><input id="profEmail" value="user@demo.com"></div>
+          <div class="pf2"><label>Nomor WhatsApp</label><input id="profPhone" value="081234567890"></div>
+          <div class="pf2"><label>Tanggal Lahir</label><input type="date" value="1999-05-15"></div>
+          <button class="save-btn" onclick="saveProfile()">Simpan Perubahan</button>
+        </div>
+        <div class="prof-card">
+          <div class="prof-title">🔐 Keamanan</div>
+          <div class="pf2"><label>Password Lama</label><input type="password" placeholder="••••••••"></div>
+          <div class="pf2"><label>Password Baru</label><input type="password" placeholder="Min. 8 karakter"></div>
+          <div class="pf2"><label>Konfirmasi Password</label><input type="password" placeholder="Ulangi password baru"></div>
+          <button class="save-btn" onclick="toast('Password berhasil diperbarui','ok')">Update Password</button>
+        </div>
+        <div class="prof-card">
+          <div class="prof-title">🔔 Notifikasi</div>
+          <div class="notif-row"><div><div class="notif-label">Email Konfirmasi Order</div><div class="notif-sub">Kirim email setiap transaksi</div></div><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+          <div class="notif-row"><div><div class="notif-label">WhatsApp Notifikasi</div><div class="notif-sub">Update status via WA</div></div><div class="toggle on" onclick="toggleNotif(this)"></div></div>
+          <div class="notif-row"><div><div class="notif-label">Promo & Penawaran</div><div class="notif-sub">Info diskon terbaru</div></div><div class="toggle" onclick="toggleNotif(this)"></div></div>
+          <div class="notif-row"><div><div class="notif-label">Newsletter Mingguan</div><div class="notif-sub">Ringkasan aktivitas akun</div></div><div class="toggle" onclick="toggleNotif(this)"></div></div>
+        </div>
+        <div class="prof-card">
+          <div class="prof-title">⚠️ Zona Bahaya</div>
+          <div style="font-size:.8rem;color:var(--t2);line-height:1.6;margin-bottom:14px">Tindakan berikut bersifat permanen dan tidak bisa dibatalkan.</div>
+          <button style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.08);color:var(--gold);font-size:.82rem;font-weight:700;cursor:pointer;margin-bottom:8px;transition:.2s" onmouseover="this.style.background='rgba(245,158,11,.15)'" onmouseout="this.style.background='rgba(245,158,11,.08)'" onclick="toast('Fitur ekspor data akan tersedia','info')">📥 Ekspor Data Akun</button>
+          <button style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--red);font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s" onmouseover="this.style.background='rgba(239,68,68,.15)'" onmouseout="this.style.background='rgba(239,68,68,.08)'" onclick="confirmDelete()">🗑️ Hapus Akun</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────
+const GAMES_LIST = [
+  {name:'Mobile Legends',icon:'⚔️',minPrice:'Rp 19.000'},
+  {name:'Free Fire',icon:'🔥',minPrice:'Rp 14.000'},
+  {name:'PUBG Mobile',icon:'🪖',minPrice:'Rp 17.000'},
+  {name:'Genshin Impact',icon:'🌟',minPrice:'Rp 15.000'},
+  {name:'Honkai Star Rail',icon:'🚂',minPrice:'Rp 15.000'},
+  {name:'Zenless Zone Zero',icon:'⚡',minPrice:'Rp 15.000'},
+  {name:'Valorant',icon:'🎮',minPrice:'Rp 52.000'},
+  {name:'COD Mobile',icon:'🎯',minPrice:'Rp 15.000'},
+  {name:'Roblox',icon:'🟥',minPrice:'Rp 55.000'},
+  {name:'Wild Rift',icon:'🦁',minPrice:'Rp 52.000'},
+];
+
+const TESTIMONIALS = [
+  {stars:'★★★★★',text:'Udah pakai DaffaStore lebih dari 6 bulan. Diamond selalu masuk dalam hitungan detik, harga juga beneran paling murah dibanding tempat lain yang pernah aku coba.',name:'Rizky Ardiansyah',game:'Mobile Legends Player',color:'#7c3aed'},
+  {stars:'★★★★★',text:'Awalnya ragu, tapi setelah coba sekali langsung ketagihan. Prosesnya super cepet dan CS-nya responsif banget. Top up FF jadi lebih hemat!',name:'Ayu Wandira',game:'Free Fire Diamond Hunter',color:'#10b981'},
+  {stars:'★★★★★',text:'Program referralnya the best! Udah dapet komisi hampir Rp 200rb dalam sebulan cuma dari ngajak teman-teman top up di sini. Highly recommended!',name:'Kevin Pratama',game:'Content Creator Gaming',color:'#00d4ff'},
+  {stars:'★★★★★',text:'Genesis Crystal Genshin masuk instan, harga lebih murah dari Codashop. Poin rewardnya juga bisa ditukar voucher diskon. 10/10!',name:'Sari Dewi',game:'Genshin Impact AR 55',color:'#ec4899'},
+  {stars:'★★★★★',text:'Bayarnya mudah banget, tinggal scan QRIS langsung konfirmasi. Diamond ML langsung masuk sebelum aku sempet nutup aplikasinya. Super fast!',name:'Bima Saputra',game:'ML Top Global',color:'#f59e0b'},
+  {stars:'★★★★★',text:'Dulu sering top up di tempat lain dan sering lambat. Sejak pindah ke DaffaStore, belum pernah ada masalah. Pelayanannya profesional banget.',name:'Cinta Ramadhani',game:'PUBG Mobile Conqueror',color:'#f97316'},
+];
+
+const FAQS = [
+  {q:'Berapa lama proses top up setelah pembayaran?',a:'Proses top up berjalan otomatis setelah pembayaran dikonfirmasi. Rata-rata kurang dari 30 detik. Untuk metode transfer bank, proses dimulai setelah konfirmasi bank (biasanya 1-5 menit).'},
+  {q:'Apa yang terjadi jika top up gagal setelah saya bayar?',a:'Jika terjadi kegagalan teknis setelah pembayaran berhasil, uang kamu 100% aman. Kami akan memproses ulang secara manual dalam 1x24 jam atau melakukan refund penuh ke metode pembayaran asal.'},
+  {q:'Bagaimana cara mendapatkan poin reward?',a:'Setiap transaksi sukses menghasilkan poin setara 1% dari nilai pembelian. Poin bisa ditukar dengan voucher diskon, top up gratis, atau merchandise eksklusif DaffaStore.'},
+  {q:'Apakah ada minimum pembelian?',a:'Tidak ada minimum pembelian. Kamu bisa mulai top up dari nominal terkecil yang tersedia untuk masing-masing game, misalnya 86 Diamond ML seharga Rp 19.000.'},
+  {q:'Metode pembayaran apa saja yang tersedia?',a:'Kami mendukung 12+ metode pembayaran: QRIS (semua e-wallet), GoPay, OVO, Dana, ShopeePay, Transfer BCA/BNI/BRI/Mandiri via Virtual Account, Alfamart, dan Indomaret.'},
+  {q:'Bagaimana cara kerja program referral?',a:'Daftarkan akun dan bagikan kode referral unikmu. Setiap teman yang mendaftar menggunakan kode kamu dan melakukan transaksi, kamu mendapat komisi 5% dari nilai transaksi mereka selamanya — tidak ada batas waktu!'},
+  {q:'Apakah data akun game saya aman?',a:'Ya, sangat aman. Kami hanya membutuhkan User ID game (bukan username/password) untuk proses top up. Semua data terenkripsi SSL dan tidak pernah kami simpan atau bagikan ke pihak ketiga.'},
+];
+
+const VOUCHERS = [
+  {pts:500, name:'Diskon 5%', desc:'Potongan 5% untuk semua game', color:'var(--cyan)',    badge:'Populer',     bc:'rgba(0,212,255,.12)',btc:'var(--cyan)'},
+  {pts:1000,name:'Diskon 10%',desc:'Potongan 10% maks. Rp 15.000',color:'var(--purple)',  badge:'Hot',         bc:'rgba(124,58,237,.12)',btc:'#a78bfa'},
+  {pts:1500,name:'Gratis 86 Diamond ML',desc:'Top up 86 Diamond ML gratis',color:'var(--green)',  badge:'Terbatas',    bc:'rgba(16,185,129,.12)',btc:'var(--green)'},
+  {pts:2000,name:'Diskon 20%',desc:'Potongan 20% maks. Rp 30.000',color:'var(--gold)',    badge:'Best Value',  bc:'rgba(245,158,11,.12)',btc:'var(--gold)'},
+  {pts:3000,name:'Diskon 30%',desc:'Potongan 30% maks. Rp 50.000',color:'var(--pink)',    badge:'Premium',     bc:'rgba(236,72,153,.12)',btc:'var(--pink)'},
+  {pts:5000,name:'Top Up Rp 50.000 Gratis',desc:'Kredit senilai Rp 50.000',color:'var(--red)',     badge:'Legendary',   bc:'rgba(239,68,68,.12)',btc:'var(--red)'},
+];
+
+const USER_ORDERS = [
+  {game:'Mobile Legends',icon:'⚔️',item:'514 Diamond',price:111000,status:'SUCCESS',date:'20 Mei 2025, 14:32'},
+  {game:'Free Fire',     icon:'🔥',item:'355 Diamond',price:69000, status:'SUCCESS',date:'18 Mei 2025, 09:15'},
+  {game:'PUBG Mobile',   icon:'🪖',item:'660 UC',     price:162000,status:'SUCCESS',date:'15 Mei 2025, 21:44'},
+  {game:'Genshin Impact',icon:'🌟',item:'330 Crystal', price:79000, status:'SUCCESS',date:'12 Mei 2025, 16:20'},
+  {game:'Mobile Legends',icon:'⚔️',item:'172 Diamond',price:38000, status:'SUCCESS',date:'8 Mei 2025, 11:05'},
+];
+
+// ── INIT ──────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 40);
+});
+
+window.addEventListener('load', () => {
+  animateCounters();
+  renderTicker();
+  renderGames();
+  renderTestimonials();
+  renderFAQ();
+});
+
+// ── COUNTERS ──────────────────────────────────
+function animateCounters() {
+  const targets = [{id:'c1',end:2500000,suffix:'+'},{id:'c2',end:30,suffix:'+'},{id:'c3',end:28,suffix:'s'},{id:'c4',end:150000,suffix:'+'}];
+  targets.forEach(({id,end,suffix}) => {
+    let cur = 0; const step = end / 60;
+    const iv = setInterval(() => {
+      cur = Math.min(cur + step, end);
+      document.getElementById(id).textContent = Math.floor(cur).toLocaleString('id-ID') + suffix;
+      if (cur >= end) clearInterval(iv);
+    }, 25);
+  });
+}
+
+// ── TICKER ────────────────────────────────────
+function renderTicker() {
+  const items = [
+    '✅ Daffa top up 514 Diamond ML','⚡ Rizky beli 660 UC PUBG instan',
+    '🔥 Ayu top up 355 Diamond FF','✅ Bima beli 330 Genesis Crystal',
+    '🎁 Kupon RAMADAN25 masih aktif!','⚡ Kevin dapat komisi referral Rp 12.500',
+    '✅ Sari top up 1.090 Oneiric Shard','🎉 Member baru dapat 500 poin bonus!',
+    '⚡ Cinta beli 475 VP Valorant','✅ Andi top up 800 Robux Roblox',
+  ];
+  const t = document.getElementById('ticker');
+  let h = '';
+  for (let i = 0; i < 3; i++) items.forEach(x => { h += `<span class="ti"><span class="dot"></span>${x}</span>`; });
+  t.innerHTML = h;
+}
+
+// ── GAMES ─────────────────────────────────────
+function renderGames() {
+  document.getElementById('gamesScroll').innerHTML = GAMES_LIST.map(g => `
+    <div class="gs-card" onclick="toast('Top up ${g.name} — segera tersedia!','info')">
+      <div class="gs-icon">${g.icon}</div>
+      <div class="gs-name">${g.name}</div>
+      <div class="gs-price">Mulai ${g.minPrice}</div>
+    </div>`).join('');
+}
+
+// ── TESTIMONIALS ──────────────────────────────
+function renderTestimonials() {
+  document.getElementById('testiGrid').innerHTML = TESTIMONIALS.map(t => `
+    <div class="testi-card">
+      <div class="testi-stars">${t.stars}</div>
+      <div class="testi-text">"${t.text}"</div>
+      <div class="testi-user">
+        <div class="testi-avatar" style="background:${t.color}">${t.name[0]}</div>
+        <div><div class="testi-name">${t.name}</div><div class="testi-game">${t.game}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── FAQ ───────────────────────────────────────
+function renderFAQ() {
+  document.getElementById('faqList').innerHTML = FAQS.map(f => `
+    <div class="faq-item" onclick="toggleFAQ(this)">
+      <div class="faq-q">${f.q}<span class="faq-arrow">▼</span></div>
+      <div class="faq-a"><div class="faq-a-inner" style="padding-top:14px">${f.a}</div></div>
+    </div>`).join('');
+}
+function toggleFAQ(el) {
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+// ── AUTH ──────────────────────────────────────
+let currentUser = null;
+
+function openPortal(tab) {
+  document.getElementById('portalOverlay').classList.add('show');
+  switchTab(tab);
+}
+function closePortal() { document.getElementById('portalOverlay').classList.remove('show'); }
+function handlePortalClick(e) { if (e.target === document.getElementById('portalOverlay')) closePortal(); }
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  if (!email || !pass) { toast('Isi email dan password dulu', 'err'); return; }
+  if (email !== 'user@demo.com' || pass !== 'demo123') {
+    if (email.includes('@') && pass.length >= 6) {
+      loginSuccess({name: email.split('@')[0], email, points: 500});
+    } else { toast('Email atau password salah', 'err'); return; }
+  } else {
+    loginSuccess({name: 'Daffa Putra', email: 'user@demo.com', points: 1250});
+  }
+}
+
+function doRegister() {
+  const fn = document.getElementById('regFirst').value.trim();
+  const em = document.getElementById('regEmail').value.trim();
+  const pw = document.getElementById('regPass').value;
+  if (!fn || !em || !pw) { toast('Lengkapi semua data wajib', 'err'); return; }
+  if (!em.includes('@')) { toast('Format email tidak valid', 'err'); return; }
+  if (pw.length < 8) { toast('Password minimal 8 karakter', 'err'); return; }
+  loginSuccess({name: fn + ' ' + (document.getElementById('regLast').value.trim()), email: em, points: 500, isNew: true});
+}
+
+function socialLogin(provider) {
+  loginSuccess({name: provider + ' User', email: provider.toLowerCase() + '@oauth.com', points: 500});
+}
+
+function loginSuccess(user) {
+  currentUser = user;
+  closePortal();
+  document.getElementById('dpName').textContent    = user.name;
+  document.getElementById('dpEmail').textContent   = user.email;
+  document.getElementById('dpAvatar').textContent  = user.name[0].toUpperCase();
+  document.getElementById('userPoints').textContent = user.points.toLocaleString('id-ID');
+  document.getElementById('vcPoints').textContent   = user.points.toLocaleString('id-ID');
+  document.getElementById('ms1').textContent = USER_ORDERS.length;
+  document.getElementById('ms2').textContent = 'Rp ' + USER_ORDERS.reduce((s,o)=>s+o.price,0).toLocaleString('id-ID');
+  document.getElementById('ms3').textContent = '12';
+  document.getElementById('ms4').textContent = '3';
+  const refCode = user.name.split(' ')[0].toUpperCase() + '2025';
+  document.getElementById('userRefCode').textContent = refCode;
+  document.getElementById('refLink').textContent = 'https://daffastore.com?ref=' + refCode;
+  renderOrderList('homeOrderList',  USER_ORDERS.slice(0,3));
+  renderOrderList('fullOrderList', USER_ORDERS);
+  renderVouchers();
+  document.getElementById('dashPortal').classList.add('show');
+  toast(user.isNew ? '🎉 Akun berhasil dibuat! 500 poin bonus telah ditambahkan' : `Selamat datang kembali, ${user.name.split(' ')[0]}! 👋`, 'ok');
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('dashPortal').classList.remove('show');
+  toast('Kamu telah keluar dari akun', 'info');
+}
+
+// ── DASHBOARD ─────────────────────────────────
+function dpTab(id, btn) {
+  document.querySelectorAll('.dp-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('dp-' + id).classList.add('active');
+  if (btn) {
+    document.querySelectorAll('.dp-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function renderOrderList(containerId, orders) {
+  const stClass = {SUCCESS:'st-ok',PENDING:'st-pend',FAILED:'st-fail'};
+  const stLabel = {SUCCESS:'✅ Sukses',PENDING:'⏳ Pending',FAILED:'❌ Gagal'};
+  document.getElementById(containerId).innerHTML = orders.map(o => `
+    <div class="ol-item" onclick="toast('Detail order: ${o.game} · ${o.item}','info')">
+      <div class="ol-icon">${o.icon}</div>
+      <div class="ol-info">
+        <div class="ol-game">${o.game}</div>
+        <div class="ol-item-name">${o.item}</div>
+        <div class="ol-date">${o.date}</div>
+      </div>
+      <div class="ol-right">
+        <div class="ol-price">Rp ${o.price.toLocaleString('id-ID')}</div>
+        <span class="ol-status ${stClass[o.status]}">${stLabel[o.status]}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderVouchers() {
+  const userPts = currentUser?.points || 0;
+  document.getElementById('voucherGrid').innerHTML = VOUCHERS.map(v => `
+    <div class="vc-card" onclick="redeemVoucher(${v.pts},'${v.name}')">
+      <div class="vc-pts">💎 ${v.pts.toLocaleString()} Poin</div>
+      <div class="vc-name">${v.name}</div>
+      <div class="vc-desc">${v.desc}</div>
+      <span class="vc-badge" style="background:${v.bc};color:${v.btc}">${v.badge}</span>
+      <div style="margin-top:10px">
+        <button style="width:100%;padding:9px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;${userPts >= v.pts ? 'background:var(--grad);color:#fff' : 'background:var(--b2);color:var(--t3);cursor:not-allowed'}"
+          ${userPts < v.pts ? 'disabled' : ''}>
+          ${userPts >= v.pts ? 'Tukar Sekarang' : 'Poin Kurang'}
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function redeemVoucher(pts, name) {
+  if (!currentUser || currentUser.points < pts) { toast('Poin tidak cukup untuk voucher ini', 'err'); return; }
+  currentUser.points -= pts;
+  document.getElementById('userPoints').textContent = currentUser.points.toLocaleString('id-ID');
+  document.getElementById('vcPoints').textContent   = currentUser.points.toLocaleString('id-ID');
+  renderVouchers();
+  toast(`🎉 Voucher "${name}" berhasil ditukar!`, 'ok');
+}
+
+// ── UTILS ─────────────────────────────────────
+function scrollSec(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); }
+function scrollToTop() { window.scrollTo({top:0,behavior:'smooth'}); }
+
+function copyPromo(code) {
+  navigator.clipboard.writeText(code).catch(()=>{});
+  toast(`Kode ${code} berhasil disalin! 🎉`, 'ok');
+}
+
+function copyRefCode() {
+  const code = document.getElementById('userRefCode').textContent;
+  navigator.clipboard.writeText(code).catch(()=>{});
+  toast('Kode referral disalin!', 'ok');
+}
+
+function toggleNotif(el) { el.classList.toggle('on'); toast('Preferensi notifikasi diperbarui', 'info'); }
+
+function saveProfile() {
+  const name = document.getElementById('profName').value;
+  if (currentUser) { currentUser.name = name; document.getElementById('dpName').textContent = name; }
+  toast('Profil berhasil disimpan ✅', 'ok');
+}
+
+function confirmDelete() {
+  if (confirm('Yakin ingin menghapus akun? Tindakan ini tidak bisa dibatalkan.')) {
+    doLogout(); toast('Akun telah dihapus', 'err');
+  }
+}
+
+function toast(msg, type = 'info') {
+  const w = document.getElementById('toastW');
+  const d = document.createElement('div');
+  d.className = `toast ${type}`;
+  d.textContent = msg;
+  w.appendChild(d);
+  setTimeout(() => d.style.opacity = '0', 2700);
+  setTimeout(() => d.remove(), 3000);
+}
+</script>
+</body>
+</html>

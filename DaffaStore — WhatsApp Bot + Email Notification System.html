@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DaffaStore — Notification Center</title>
+<style>
+:root{
+  --bg:#07090f;--s1:#0d1017;--s2:#131820;--s3:#181f2e;--s4:#1c2438;
+  --b1:#1e2538;--b2:#252d42;--b3:#2d3655;
+  --cyan:#00d4ff;--purple:#7c3aed;--green:#10b981;--gold:#f59e0b;--red:#ef4444;--pink:#ec4899;
+  --wa:#25d366;--email:#ea4335;
+  --t1:#e2e8f0;--t2:#94a3b8;--t3:#475569;
+  --kw:#c084fc;--str:#86efac;--num:#fda4af;--fn:#93c5fd;--cmt:#475569;--prop:#fcd34d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* TOP BAR */
+.topbar{height:52px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;position:sticky;top:0;z-index:100}
+.tb-logo{font-size:1rem;font-weight:900;margin-right:4px}.tb-logo b{color:var(--cyan)}
+.tb-badge{font-size:.65rem;font-weight:700;padding:2px 9px;border-radius:100px;background:rgba(37,211,102,.12);color:var(--wa);border:1px solid rgba(37,211,102,.2)}
+.tb-right{margin-left:auto;display:flex;gap:8px}
+.tb-btn{padding:6px 14px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s;border:none}
+.tb-outline{background:transparent;border:1px solid var(--b1);color:var(--t2)}
+.tb-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+.tb-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff}
+.tb-primary:hover{opacity:.9}
+
+/* TABS NAV */
+.tabs-nav{background:var(--s2);border-bottom:1px solid var(--b1);display:flex;padding:0 20px;overflow-x:auto;flex-shrink:0}
+.tabs-nav::-webkit-scrollbar{display:none}
+.tn{padding:12px 16px;font-size:.8rem;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tn:hover{color:var(--t2)}
+.tn.active{color:var(--t1);border-bottom-color:var(--cyan)}
+
+/* MAIN */
+.content{flex:1;overflow-y:auto;padding:24px clamp(16px,4vw,40px)}
+.page{display:none}.page.active{display:block}
+
+/* SECTION TITLE */
+.pg-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.pg-title{font-size:1.15rem;font-weight:900}
+.pg-sub{font-size:.78rem;color:var(--t3);margin-top:3px}
+
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.sc{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px;transition:.2s}
+.sc:hover{border-color:var(--b2)}
+.sc-v{font-size:1.6rem;font-weight:900;line-height:1;margin-bottom:5px}
+.sc-l{font-size:.72rem;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.sc-t{font-size:.7rem;margin-top:6px;font-weight:600}
+.sc-t.up{color:var(--green)}.sc-t.dn{color:var(--red)}
+
+/* PHONE MOCKUP */
+.phone-wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.phone{width:280px;flex-shrink:0;background:#000;border-radius:36px;padding:12px;box-shadow:0 24px 60px rgba(0,0,0,.6);border:2px solid #1a1a1a}
+.phone-screen{background:#e5ddd5;border-radius:26px;overflow:hidden;min-height:520px;display:flex;flex-direction:column}
+.phone-header{background:#075e54;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.ph-back{color:rgba(255,255,255,.7);font-size:.8rem;cursor:pointer}
+.ph-avatar{width:34px;height:34px;background:var(--wa);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.ph-info{flex:1}
+.ph-name{font-size:.85rem;font-weight:700;color:#fff}
+.ph-status{font-size:.68rem;color:rgba(255,255,255,.7)}
+.phone-body{flex:1;padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.wa-msg{max-width:85%;border-radius:12px;padding:8px 12px;font-size:.78rem;line-height:1.6;position:relative;word-break:break-word}
+.wa-msg.recv{background:#fff;border-radius:12px 12px 12px 0;align-self:flex-start;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.wa-msg.sent{background:#dcf8c6;border-radius:12px 12px 0 12px;align-self:flex-end;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.wa-time{font-size:.62rem;color:rgba(0,0,0,.45);text-align:right;margin-top:4px}
+.wa-bold{font-weight:700}
+.wa-green{color:#075e54}
+.wa-line{height:1px;background:rgba(0,0,0,.08);margin:6px 0}
+.wa-emoji{font-size:1.1rem}
+.phone-input{background:#f0f0f0;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.ph-inp{flex:1;background:#fff;border-radius:100px;padding:7px 14px;font-size:.75rem;color:#333;border:none;outline:none}
+.ph-send{width:34px;height:34px;background:var(--wa);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem}
+
+/* CODE */
+.code-block{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.cb-head{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--b1);background:rgba(255,255,255,.02)}
+.cb-lang{font-size:.7rem;font-weight:700;color:var(--t3);display:flex;align-items:center;gap:7px}
+.cb-lang span{width:9px;height:9px;border-radius:50%}
+.cb-copy{background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t2);padding:3px 11px;font-size:.7rem;font-weight:700;cursor:pointer;transition:.2s}
+.cb-copy:hover{border-color:var(--cyan);color:var(--cyan)}
+pre{padding:16px 18px;overflow-x:auto;font-family:'Cascadia Code','Fira Code',monospace;font-size:.76rem;line-height:1.7}
+.kw{color:var(--kw)}.str{color:var(--str)}.num{color:var(--num)}.fn{color:var(--fn)}.cmt{color:var(--cmt);font-style:italic}.prop{color:var(--prop)}.cls{color:#fb923c}
+
+/* EMAIL PREVIEW */
+.email-frame{background:#f4f6fb;border-radius:12px;padding:16px;overflow:auto;max-height:600px}
+.email-client-bar{background:#fff;border-radius:8px 8px 0 0;padding:10px 14px;border-bottom:2px solid #e8eaf0;display:flex;align-items:center;gap:8px;font-size:.75rem;color:#555}
+.ecb-dot{width:10px;height:10px;border-radius:50%}
+.email-body{background:#fff;border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+
+/* LOG TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:9px 14px;font-size:.68rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--b1)}
+td{padding:10px 14px;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.01)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px}
+.b-ok{background:rgba(16,185,129,.12);color:var(--green)}
+.b-fail{background:rgba(239,68,68,.12);color:var(--red)}
+.b-pend{background:rgba(245,158,11,.12);color:var(--gold)}
+.b-wa{background:rgba(37,211,102,.12);color:var(--wa)}
+.b-em{background:rgba(234,67,53,.12);color:var(--email)}
+.b-sms{background:rgba(59,130,246,.12);color:#60a5fa}
+
+/* PROVIDER CARDS */
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:20px}
+.pv-card{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:18px;transition:.2s;cursor:pointer}
+.pv-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.pv-card.selected{border-color:var(--wa)}
+.pv-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pv-logo{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.pv-name{font-weight:800;font-size:.9rem}
+.pv-url{font-size:.7rem;color:var(--t3)}
+.pv-desc{font-size:.78rem;color:var(--t2);line-height:1.6}
+.pv-tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pv-tag{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:100px}
+
+/* CONFIG FORM */
+.cfg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:600px){.cfg-row{grid-template-columns:1fr}}
+.fl{display:flex;flex-direction:column;gap:5px}
+.fl label{font-size:.75rem;color:var(--t2);font-weight:600}
+.fl input,.fl select,.fl textarea{background:var(--s3);border:1px solid var(--b2);border-radius:9px;padding:10px 12px;color:var(--t1);font-size:.85rem;outline:none;transition:.2s;width:100%}
+.fl input:focus,.fl select:focus,.fl textarea:focus{border-color:var(--cyan)}
+.fl textarea{resize:vertical;min-height:80px}
+.fl select option{background:var(--s1)}
+
+/* TEMPLATE SELECTOR */
+.tmpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.tmpl-card{background:var(--s3);border:1px solid var(--b2);border-radius:12px;padding:14px;cursor:pointer;transition:.2s}
+.tmpl-card:hover,.tmpl-card.active{border-color:var(--cyan);background:rgba(0,212,255,.05)}
+.tmpl-icon{font-size:1.4rem;margin-bottom:8px}
+.tmpl-name{font-size:.82rem;font-weight:700;margin-bottom:3px}
+.tmpl-desc{font-size:.7rem;color:var(--t3)}
+
+/* ALERT */
+.alert{border-radius:10px;padding:11px 15px;font-size:.8rem;line-height:1.6;display:flex;gap:9px;margin-bottom:14px}
+.al-info{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);color:var(--cyan)}
+.al-warn{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);color:var(--gold)}
+.al-ok{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);color:var(--green)}
+.al-icon{flex-shrink:0;margin-top:1px}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:9px;border:none;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff;box-shadow:0 3px 14px rgba(0,212,255,.15)}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-wa{background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.2);color:var(--wa)}
+.btn-wa:hover{background:rgba(37,211,102,.2)}
+.btn-email{background:rgba(234,67,53,.1);border:1px solid rgba(234,67,53,.2);color:var(--email)}
+.btn-email:hover{background:rgba(234,67,53,.18)}
+.btn-outline{background:transparent;border:1px solid var(--b2);color:var(--t2)}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* GRID 2 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.g2{grid-template-columns:1fr}}
+
+/* TEST PANEL */
+.test-panel{background:var(--s3);border:1px solid var(--b2);border-radius:12px;padding:18px}
+.test-title{font-size:.85rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.send-sim{display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--s2);border-radius:10px;border:1px solid var(--b1);margin-bottom:8px}
+.ss-icon{font-size:1.2rem}
+.ss-info{flex:1}
+.ss-title{font-size:.8rem;font-weight:600}
+.ss-sub{font-size:.7rem;color:var(--t3)}
+.ss-btn{padding:6px 14px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;border:none;transition:.2s}
+
+/* TOAST */
+.toast-w{position:fixed;bottom:20px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--s1);border:1px solid var(--b1);border-radius:100px;padding:8px 18px;font-size:.75rem;font-weight:600;animation:slideR .3s ease;box-shadow:0 6px 20px rgba(0,0,0,.4);white-space:nowrap}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.info{border-color:var(--cyan);color:var(--cyan)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.wa{border-color:var(--wa);color:var(--wa)}
+@keyframes slideR{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-logo">Daffa<b>Store</b></div>
+  <div class="tb-badge">🔔 Notification Center</div>
+  <div class="tb-right">
+    <button class="tb-btn tb-outline" onclick="showPage('log')">📊 View Logs</button>
+    <button class="tb-btn tb-primary" onclick="sendTestAll()">🚀 Test Kirim Semua</button>
+  </div>
+</div>
+
+<div class="tabs-nav">
+  <div class="tn active" onclick="showPage('overview',this)">📊 Overview</div>
+  <div class="tn" onclick="showPage('wa',this)">💬 WhatsApp Bot</div>
+  <div class="tn" onclick="showPage('email',this)">📧 Email Templates</div>
+  <div class="tn" onclick="showPage('code',this)">⚙️ Integration Code</div>
+  <div class="tn" onclick="showPage('log',this)">📋 Log Notifikasi</div>
+  <div class="tn" onclick="showPage('settings',this)">🔧 Konfigurasi</div>
+</div>
+
+<div class="toast-w" id="toastW"></div>
+<div class="content">
+
+<!-- ══ OVERVIEW ══ -->
+<div class="page active" id="page-overview">
+  <div class="pg-head">
+    <div><div class="pg-title">📊 Notification Overview</div><div class="pg-sub">Statistik pengiriman notifikasi hari ini</div></div>
+    <button class="btn btn-primary" onclick="showPage('wa');document.querySelectorAll('.tn')[1].classList.add('active')">+ Buat Template</button>
+  </div>
+
+  <div class="stat-row">
+    <div class="sc"><div class="sc-v" style="color:var(--wa)">1.240</div><div class="sc-l">WA Terkirim</div><div class="sc-t up">↑ 12% hari ini</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--email)">987</div><div class="sc-l">Email Terkirim</div><div class="sc-t up">↑ 8% hari ini</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--green)">98.4%</div><div class="sc-l">Delivery Rate</div><div class="sc-t up">↑ 0.2%</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--red)">21</div><div class="sc-l">Gagal Kirim</div><div class="sc-t dn">↑ 3 error baru</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--cyan)">4.2s</div><div class="sc-l">Avg Delivery</div><div class="sc-t up">↓ 0.8s lebih cepat</div></div>
+    <div class="sc"><div class="sc-v" style="color:var(--gold)">72%</div><div class="sc-l">WA Open Rate</div><div class="sc-t up">↑ 5% dari kemarin</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-head"><div class="card-title">💬 WhatsApp Channel</div><span class="badge b-ok">● Terhubung</span></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--s3);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:2rem">📱</div>
+          <div>
+            <div style="font-weight:700;font-size:.9rem">Fonnte API</div>
+            <div style="font-size:.75rem;color:var(--t2);margin-top:2px">+62 812-XXXX-XXXX · Sandbox</div>
+            <div style="font-size:.7rem;color:var(--green);margin-top:3px">● Aktif · 1.240 pesan hari ini</div>
+          </div>
+        </div>
+        <div class="tmpl-grid" style="grid-template-columns:1fr 1fr;margin-bottom:0">
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--wa)">5</div>
+            <div style="font-size:.7rem;color:var(--t3)">Template Aktif</div>
+          </div>
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--cyan)">Rp 0</div>
+            <div style="font-size:.7rem;color:var(--t3)">Biaya Bulan Ini</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">📧 Email Channel</div><span class="badge b-ok">● Terhubung</span></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--s3);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:2rem">✉️</div>
+          <div>
+            <div style="font-weight:700;font-size:.9rem">Gmail SMTP</div>
+            <div style="font-size:.75rem;color:var(--t2);margin-top:2px">noreply@daffastore.com</div>
+            <div style="font-size:.7rem;color:var(--green);margin-top:3px">● Aktif · 987 email hari ini</div>
+          </div>
+        </div>
+        <div class="tmpl-grid" style="grid-template-columns:1fr 1fr;margin-bottom:0">
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--email)">4</div>
+            <div style="font-size:.7rem;color:var(--t3)">Template Aktif</div>
+          </div>
+          <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:1.4rem;font-weight:900;color:var(--cyan)">Gratis</div>
+            <div style="font-size:.7rem;color:var(--t3)">Gmail SMTP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">📡 Alur Notifikasi Otomatis</div></div>
+    <div class="card-body">
+      <div style="display:flex;gap:0;overflow-x:auto;padding-bottom:8px">
+        <div style="display:flex;align-items:center;gap:0;min-width:max-content">
+          ${[
+            ['💳','Pembayaran\nBerhasil','var(--green)'],
+            ['→','',''],
+            ['🔔','Webhook\nDiterima','var(--cyan)'],
+            ['→','',''],
+            ['⚙️','Proses\nTop Up','var(--purple)'],
+            ['→','',''],
+            ['💬','Kirim WA\nOtomatis','var(--wa)'],
+            ['+','',''],
+            ['📧','Kirim\nEmail','var(--email)'],
+          ].map(([i,l,c]) => l ? `
+            <div style="background:var(--s3);border:1px solid var(--b2);border-radius:10px;padding:12px 14px;text-align:center;min-width:90px">
+              <div style="font-size:1.3rem;margin-bottom:5px">${i}</div>
+              <div style="font-size:.68rem;font-weight:700;color:${c};white-space:pre-line;line-height:1.3">${l}</div>
+            </div>` :
+            `<div style="color:var(--t3);padding:0 8px;font-size:1.1rem;flex-shrink:0">${i}</div>`
+          ).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">⚡ Aktivitas Terbaru</div></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Waktu</th><th>Order ID</th><th>Tipe</th><th>Tujuan</th><th>Template</th><th>Status</th></tr></thead>
+        <tbody id="recentLog"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WHATSAPP ══ -->
+<div class="page" id="page-wa">
+  <div class="pg-head">
+    <div><div class="pg-title">💬 WhatsApp Bot & Templates</div><div class="pg-sub">Kelola pesan WA otomatis menggunakan Fonnte API</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-wa" onclick="sendTestWA()">📤 Test Kirim WA</button>
+    </div>
+  </div>
+
+  <div class="alert al-info"><div class="al-icon">💡</div><div>WA Bot menggunakan <b>Fonnte API</b> (fonnte.com) — gratis 1.000 pesan/bulan. Kamu bisa ganti ke <b>WablaS</b>, <b>Zenziva</b>, atau <b>Wappin</b> sesuai kebutuhan.</div></div>
+
+  <!-- TEMPLATE SELECTOR -->
+  <div class="tmpl-grid" id="waTmplSelector">
+    <div class="tmpl-card active" onclick="selectWATmpl('success',this)"><div class="tmpl-icon">✅</div><div class="tmpl-name">Top Up Sukses</div><div class="tmpl-desc">Kirim saat item berhasil masuk</div></div>
+    <div class="tmpl-card" onclick="selectWATmpl('pending',this)"><div class="tmpl-icon">⏳</div><div class="tmpl-name">Menunggu Bayar</div><div class="tmpl-desc">Pengingat setelah buat order</div></div>
+    <div class="tmpl-card" onclick="selectWATmpl('failed',this)"><div class="tmpl-icon">❌</div><div class="tmpl-name">Top Up Gagal</div><div class="tmpl-desc">Notifikasi jika gagal diproses</div></div>
+    <div class="tmpl-card" onclick="selectWATmpl('promo',this)"><div class="tmpl-icon">🎁</div><div class="tmpl-name">Blast Promo</div><div class="tmpl-desc">Kirim ke semua pengguna</div></div>
+    <div class="tmpl-card" onclick="selectWATmpl('referral',this)"><div class="tmpl-icon">🔗</div><div class="tmpl-name">Komisi Referral</div><div class="tmpl-desc">Notif dapat komisi</div></div>
+  </div>
+
+  <div class="g2">
+    <!-- PHONE PREVIEW -->
+    <div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:6px">📱 Preview Pesan</div>
+      <div class="phone-wrap" style="flex-direction:column">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div class="ph-back">←</div>
+              <div class="ph-avatar">🤖</div>
+              <div class="ph-info">
+                <div class="ph-name">DaffaStore</div>
+                <div class="ph-status">online</div>
+              </div>
+              <div style="color:rgba(255,255,255,.6);font-size:.8rem">⋮</div>
+            </div>
+            <div class="phone-body" id="phoneBody"></div>
+            <div class="phone-input">
+              <div class="ph-inp" placeholder="Pesan" style="display:flex;align-items:center;color:#888;font-size:.75rem">Pesan</div>
+              <div class="ph-send" onclick="toast('Ini adalah preview template 😊','info')">➤</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--t2);margin-bottom:10px">✏️ Edit Template</div>
+      <div class="card">
+        <div class="card-body" style="padding:16px">
+          <div class="fl" style="margin-bottom:12px">
+            <label>Nama Template</label>
+            <input id="waTmplName" value="Top Up Sukses">
+          </div>
+          <div class="fl" style="margin-bottom:12px">
+            <label>Isi Pesan (Variabel: {nama}, {game}, {item}, {orderId}, {harga})</label>
+            <textarea id="waTmplBody" rows="10"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="saveTmpl()">💾 Simpan</button>
+            <button class="btn btn-wa" onclick="sendTestWA()">📤 Test Kirim</button>
+            <button class="btn btn-outline" onclick="resetTmpl()">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VARIABLE GUIDE -->
+      <div class="card" style="margin-top:0">
+        <div class="card-head"><div class="card-title">📌 Panduan Variabel</div></div>
+        <div class="card-body" style="padding:14px">
+          <table>
+            <thead><tr><th>Variabel</th><th>Nilai Contoh</th><th>Keterangan</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{nama}</td><td>Daffa Putra</td><td style="color:var(--t2)">Nama pengguna</td></tr>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{game}</td><td>Mobile Legends</td><td style="color:var(--t2)">Nama game</td></tr>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{item}</td><td>514 Diamond</td><td style="color:var(--t2)">Nominal dibeli</td></tr>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{orderId}</td><td>DS-ABC123-XY</td><td style="color:var(--t2)">ID transaksi</td></tr>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{harga}</td><td>Rp 111.000</td><td style="color:var(--t2)">Total pembayaran</td></tr>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{waktu}</td><td>20 Mei 2025, 14:32</td><td style="color:var(--t2)">Waktu transaksi</td></tr>
+              <tr><td style="font-family:monospace;color:var(--cyan)">{poin}</td><td>+111 Poin</td><td style="color:var(--t2)">Poin yang didapat</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMAIL ══ -->
+<div class="page" id="page-email">
+  <div class="pg-head">
+    <div><div class="pg-title">📧 Email Templates</div><div class="pg-sub">Template HTML email profesional untuk setiap skenario</div></div>
+    <button class="btn btn-email" onclick="sendTestEmail()">📤 Test Kirim Email</button>
+  </div>
+
+  <div class="tmpl-grid" id="emailTmplSel">
+    <div class="tmpl-card active" onclick="selectEmailTmpl('success',this)"><div class="tmpl-icon">✅</div><div class="tmpl-name">Order Sukses</div><div class="tmpl-desc">Konfirmasi top up berhasil</div></div>
+    <div class="tmpl-card" onclick="selectEmailTmpl('pending',this)"><div class="tmpl-icon">⏳</div><div class="tmpl-name">Pending Order</div><div class="tmpl-desc">Instruksi pembayaran</div></div>
+    <div class="tmpl-card" onclick="selectEmailTmpl('failed',this)"><div class="tmpl-icon">❌</div><div class="tmpl-name">Order Gagal</div><div class="tmpl-desc">Notifikasi & info refund</div></div>
+    <div class="tmpl-card" onclick="selectEmailTmpl('welcome',this)"><div class="tmpl-icon">👋</div><div class="tmpl-name">Welcome User</div><div class="tmpl-desc">Email selamat datang</div></div>
+  </div>
+
+  <div style="font-size:.78rem;font-weight:700;color:var(--t2);margin-bottom:10px">👁️ Preview Email</div>
+  <div class="email-frame">
+    <div class="email-client-bar">
+      <div class="ecb-dot" style="background:#ff5f56"></div>
+      <div class="ecb-dot" style="background:#ffbd2e"></div>
+      <div class="ecb-dot" style="background:#27c93f"></div>
+      <span style="margin-left:8px;font-size:.72rem;flex:1">Gmail — noreply@daffastore.com</span>
+    </div>
+    <div class="email-body" id="emailPreview"></div>
+  </div>
+</div>
+
+<!-- ══ CODE ══ -->
+<div class="page" id="page-code">
+  <div class="pg-head"><div><div class="pg-title">⚙️ Integration Code</div><div class="pg-sub">Kode siap pakai untuk integrasi ke backend Node.js</div></div></div>
+
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-lang"><span style="background:#25d366"></span>services/whatsapp.js</div><button class="cb-copy" onclick="copyCode(this)">Copy</button></div>
+    <pre><span class="cmt">// ── services/whatsapp.js ──────────────────────
+// WA Notification via Fonnte API (fonnte.com)
+// Ganti FONNTE_TOKEN dengan token dari dashboard</span>
+
+<span class="kw">const</span> axios = <span class="fn">require</span>(<span class="str">'axios'</span>);
+
+<span class="kw">const</span> FONNTE_URL   = <span class="str">'https://api.fonnte.com/send'</span>;
+<span class="kw">const</span> FONNTE_TOKEN = process.env.FONNTE_TOKEN;
+
+<span class="cmt">// Kirim pesan WA single</span>
+<span class="kw">async function</span> <span class="fn">sendWA</span>(phone, message) {
+  <span class="kw">if</span> (!FONNTE_TOKEN) {
+    console.<span class="fn">warn</span>(<span class="str">'[WA] FONNTE_TOKEN belum diset, skip WA'</span>);
+    <span class="kw">return null</span>;
+  }
+  <span class="kw">try</span> {
+    <span class="kw">const</span> res = <span class="kw">await</span> axios.<span class="fn">post</span>(FONNTE_URL, {
+      target:   phone.<span class="fn">replace</span>(/^0/, <span class="str">'62'</span>), <span class="cmt">// 08xxx → 628xxx</span>
+      message:  message,
+      countryCode: <span class="str">'62'</span>
+    }, {
+      headers: { Authorization: FONNTE_TOKEN }
+    });
+    console.<span class="fn">log</span>(<span class="str">\`[WA] Terkirim ke \${phone}\`</span>);
+    <span class="kw">return</span> res.data;
+  } <span class="kw">catch</span> (err) {
+    console.<span class="fn">error</span>(<span class="str">'[WA ERROR]'</span>, err.message);
+    <span class="kw">return null</span>;
+  }
+}
+
+<span class="cmt">// Template: Top Up Sukses</span>
+<span class="kw">function</span> <span class="fn">msgTopUpSukses</span>(data) {
+  <span class="kw">return</span> <span class="str">`✅ *TOP UP BERHASIL!*
+━━━━━━━━━━━━━━━━
+
+Halo *\${data.nama}*! 🎮
+
+Top up kamu telah *berhasil diproses* dan item sudah masuk ke akunmu!
+
+📋 *Detail Transaksi:*
+• Game     : \${data.game}
+• Item     : \${data.item}
+• User ID  : \${data.userId}
+• Total    : Rp \${data.harga}
+• Order ID : \${data.orderId}
+• Waktu    : \${data.waktu}
+
+💎 Kamu mendapat *+\${data.poin} Poin* reward!
+
+Terima kasih sudah top up di *DaffaStore* 🙏
+Jangan lupa bagikan kode referralmu: *\${data.refCode}*
+
+_CS: wa.me/6281234567890_`</span>;
+}
+
+<span class="cmt">// Template: Menunggu Pembayaran</span>
+<span class="kw">function</span> <span class="fn">msgPending</span>(data) {
+  <span class="kw">return</span> <span class="str">`⏳ *SELESAIKAN PEMBAYARANMU*
+━━━━━━━━━━━━━━━━
+
+Halo *\${data.nama}*!
+
+Order kamu *belum dibayar*. Segera selesaikan sebelum kedaluwarsa!
+
+🛒 *Order:* \${data.item} (\${data.game})
+💳 *Total:* Rp \${data.harga}
+⏰ *Kedaluwarsa:* \${data.expiry}
+
+➡️ Lanjutkan bayar:
+\${data.paymentUrl}
+
+_Butuh bantuan? Hubungi CS kami._`</span>;
+}
+
+<span class="cmt">// Template: Top Up Gagal</span>
+<span class="kw">function</span> <span class="fn">msgGagal</span>(data) {
+  <span class="kw">return</span> <span class="str">`❌ *MAAF, TOP UP GAGAL*
+━━━━━━━━━━━━━━━━
+
+Halo *\${data.nama}*,
+
+Sayangnya top up kamu *gagal diproses* karena kendala teknis.
+
+📋 Order ID: \${data.orderId}
+💳 Total: Rp \${data.harga}
+
+✅ *Jangan khawatir!* Uangmu 100% aman.
+Refund akan diproses dalam *1x24 jam*.
+
+Hubungi CS kami jika ada pertanyaan:
+📱 wa.me/6281234567890
+
+_Mohon maaf atas ketidaknyamanannya_ 🙏`</span>;
+}
+
+<span class="cmt">// Template: Notif Komisi Referral</span>
+<span class="kw">function</span> <span class="fn">msgKomisi</span>(data) {
+  <span class="kw">return</span> <span class="str">`💰 *KOMISI REFERRAL MASUK!*
+━━━━━━━━━━━━━━━━
+
+Halo *\${data.nama}*! 🎉
+
+*\${data.teman}* baru saja top up menggunakan kode referralmu!
+
+💵 Komisi kamu: *Rp \${data.komisi}*
+💎 Total komisi: *Rp \${data.totalKomisi}*
+
+Saldo komisimu bisa dicairkan kapan saja.
+_Terus ajak teman dan raih lebih banyak komisi!_ 🚀`</span>;
+}
+
+<span class="cmt">// Kirim notif berdasarkan event</span>
+<span class="kw">async function</span> <span class="fn">notifyOrder</span>(event, order, extra = {}) {
+  <span class="kw">const</span> data = {
+    nama:    extra.name || <span class="str">'Pelanggan'</span>,
+    game:    order.game_name,
+    item:    <span class="str">\`\${order.amount} \${order.currency}\`</span>,
+    userId:  order.user_game_id,
+    harga:   (+order.amount_paid).<span class="fn">toLocaleString</span>(<span class="str">'id-ID'</span>),
+    orderId: order.id,
+    waktu:   <span class="kw">new</span> <span class="cls">Date</span>().<span class="fn">toLocaleString</span>(<span class="str">'id-ID'</span>),
+    poin:    Math.<span class="fn">floor</span>(order.amount_paid / <span class="num">1000</span>),
+    refCode: extra.refCode || <span class="str">''</span>,
+    ...extra
+  };
+
+  <span class="kw">let</span> msg;
+  <span class="kw">if</span> (event === <span class="str">'SUCCESS'</span>) msg = <span class="fn">msgTopUpSukses</span>(data);
+  <span class="kw">else if</span> (event === <span class="str">'PENDING'</span>) msg = <span class="fn">msgPending</span>(data);
+  <span class="kw">else if</span> (event === <span class="str">'FAILED'</span>)  msg = <span class="fn">msgGagal</span>(data);
+  <span class="kw">else return</span>;
+
+  <span class="kw">return</span> <span class="fn">sendWA</span>(extra.phone, msg);
+}
+
+module.<span class="prop">exports</span> = { sendWA, notifyOrder, msgTopUpSukses, msgPending, msgGagal, msgKomisi };</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-lang"><span style="background:#ea4335"></span>services/email.js · Update dari sebelumnya</div><button class="cb-copy" onclick="copyCode(this)">Copy</button></div>
+    <pre><span class="cmt">// ── services/email.js (update) ────────────────</span>
+<span class="kw">const</span> nodemailer = <span class="fn">require</span>(<span class="str">'nodemailer'</span>);
+
+<span class="kw">const</span> transport = nodemailer.<span class="fn">createTransport</span>({
+  host: <span class="str">'smtp.gmail.com'</span>, port: <span class="num">587</span>, secure: <span class="kw">false</span>,
+  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+});
+
+<span class="cmt">// Kirim email sukses + notif WA sekaligus</span>
+<span class="kw">async function</span> <span class="fn">sendSuccessNotif</span>(order, user) {
+  <span class="kw">const</span> wa    = <span class="fn">require</span>(<span class="str">'./whatsapp'</span>);
+  <span class="kw">const</span> tasks = [];
+
+  <span class="cmt">// Email</span>
+  <span class="kw">if</span> (order.email) {
+    tasks.<span class="fn">push</span>(transport.<span class="fn">sendMail</span>({
+      from:    process.env.EMAIL_FROM,
+      to:      order.email,
+      subject: <span class="str">\`✅ Top Up Berhasil! \${order.game_name} — \${order.id}\`</span>,
+      html:    <span class="fn">getEmailTemplate</span>(<span class="str">'success'</span>, order)
+    }));
+  }
+
+  <span class="cmt">// WhatsApp</span>
+  <span class="kw">if</span> (user?.phone) {
+    tasks.<span class="fn">push</span>(wa.<span class="fn">notifyOrder</span>(<span class="str">'SUCCESS'</span>, order, {
+      name:    user.name,
+      phone:   user.phone,
+      refCode: user.ref_code
+    }));
+  }
+
+  <span class="cmt">// Kirim paralel (tidak saling tunggu)</span>
+  <span class="kw">await</span> Promise.<span class="fn">allSettled</span>(tasks);
+}
+
+<span class="cmt">// Builder HTML email</span>
+<span class="kw">function</span> <span class="fn">getEmailTemplate</span>(type, data) {
+  <span class="kw">const</span> styles = <span class="str">`font-family:'Segoe UI',sans-serif;max-width:580px;margin:0 auto`</span>;
+  <span class="kw">const</span> header = (color, icon, title) => <span class="str">\`
+    &lt;div style="background:\${color};padding:32px;text-align:center;border-radius:16px 16px 0 0"&gt;
+      &lt;div style="font-size:3rem;margin-bottom:10px"&gt;\${icon}&lt;/div&gt;
+      &lt;h1 style="color:#fff;margin:0;font-size:1.5rem"&gt;\${title}&lt;/h1&gt;
+    &lt;/div&gt;\`</span>;
+
+  <span class="kw">if</span> (type === <span class="str">'success'</span>) <span class="kw">return</span> <span class="str">\`
+    &lt;div style="\${styles}"&gt;
+      \${header(<span class="str">'#10b981'</span>, <span class="str">'✅'</span>, <span class="str">'Top Up Berhasil!'</span>)}
+      &lt;div style="background:#fff;padding:28px;border-radius:0 0 16px 16px"&gt;
+        &lt;p&gt;Halo &lt;b&gt;\${data.user_name}&lt;/b&gt;, top up kamu sudah berhasil diproses!&lt;/p&gt;
+        &lt;table style="width:100%;border-collapse:collapse;margin:16px 0"&gt;
+          &lt;tr style="background:#f8f9fa"&gt;&lt;td style="padding:10px"&gt;Game&lt;/td&gt;&lt;td style="padding:10px;font-weight:700"&gt;\${data.game_name}&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td style="padding:10px"&gt;Item&lt;/td&gt;&lt;td style="padding:10px;font-weight:700"&gt;\${data.amount} \${data.currency}&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr style="background:#f8f9fa"&gt;&lt;td style="padding:10px"&gt;Total&lt;/td&gt;&lt;td style="padding:10px;font-weight:700;color:#7c3aed"&gt;Rp \${(+data.price).toLocaleString()}&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td style="padding:10px"&gt;Order ID&lt;/td&gt;&lt;td style="padding:10px;font-family:monospace"&gt;\${data.id}&lt;/td&gt;&lt;/tr&gt;
+        &lt;/table&gt;
+        &lt;p style="color:#888;font-size:.85rem"&gt;Terima kasih telah menggunakan DaffaStore! 🎮&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;\`</span>;
+}
+
+module.<span class="prop">exports</span> = { sendSuccessNotif, getEmailTemplate };</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-lang"><span style="background:#68a063"></span>Integrasi ke webhook.js</div><button class="cb-copy" onclick="copyCode(this)">Copy</button></div>
+    <pre><span class="cmt">// Tambahkan di routes/webhook.js setelah supplier berhasil</span>
+
+<span class="kw">const</span> { sendSuccessNotif } = <span class="fn">require</span>(<span class="str">'../services/email'</span>);
+
+<span class="cmt">// Dalam blok if (newStatus === 'PAID') ...</span>
+<span class="kw">const</span> result = <span class="kw">await</span> supplier.<span class="fn">processTopUp</span>(order);
+
+<span class="cmt">// Update status</span>
+db.<span class="fn">prepare</span>(<span class="str">`UPDATE orders SET status='SUCCESS', supplier_ref=? WHERE id=?`</span>)
+  .<span class="fn">run</span>(result.ref, order.id);
+
+<span class="cmt">// Ambil data user untuk WA</span>
+<span class="kw">const</span> user = db.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM users WHERE email = ?'</span>).<span class="fn">get</span>(order.email);
+
+<span class="cmt">// Kirim WA + Email paralel (tidak block webhook response)</span>
+<span class="fn">sendSuccessNotif</span>(order, user).<span class="fn">catch</span>(e =>
+  console.<span class="fn">error</span>(<span class="str">'[NOTIF ERROR]'</span>, e.message)
+);</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-lang"><span style="background:#f0db4f"></span>.env — Tambahan variabel WA</div><button class="cb-copy" onclick="copyCode(this)">Copy</button></div>
+    <pre><span class="cmt"># Fonnte WA API (fonnte.com → Dashboard → Token)</span>
+FONNTE_TOKEN=token_fonnte_kamu_disini
+
+<span class="cmt"># Alternatif provider WA:</span>
+<span class="cmt"># WAblaS : WABLAS_TOKEN=xxx, url: https://solo.wablas.com/api/send-message</span>
+<span class="cmt"># Zenziva: ZENZIVA_USER=xxx, ZENZIVA_PASS=xxx</span>
+<span class="cmt"># Wappin : WAPPIN_TOKEN=xxx</span></pre>
+  </div>
+</div>
+
+<!-- ══ LOG ══ -->
+<div class="page" id="page-log">
+  <div class="pg-head">
+    <div><div class="pg-title">📋 Log Notifikasi</div><div class="pg-sub">Riwayat semua pengiriman notifikasi</div></div>
+    <div style="display:flex;gap:8px">
+      <select style="background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:7px 10px;color:var(--t1);font-size:.75rem;outline:none" onchange="filterLog(this.value)">
+        <option value="all">Semua</option><option value="WA">WhatsApp</option><option value="Email">Email</option><option value="GAGAL">Gagal</option>
+      </select>
+      <button class="btn btn-outline" onclick="refreshLog()">🔄 Refresh</button>
+      <button class="btn btn-primary" onclick="exportLog()">⬇️ Export</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Waktu</th><th>Order ID</th><th>Channel</th><th>Tujuan</th><th>Template</th><th>Latency</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="logTable"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--b1);font-size:.75rem;color:var(--t3)">
+      <span id="logCount">Menampilkan 0 log</span>
+      <div style="display:flex;gap:4px" id="logPg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="page" id="page-settings">
+  <div class="pg-head"><div><div class="pg-title">🔧 Konfigurasi Provider</div><div class="pg-sub">Pilih dan setup provider WA & Email</div></div></div>
+
+  <div style="font-size:.85rem;font-weight:800;margin-bottom:12px">💬 WhatsApp Provider</div>
+  <div class="provider-grid">
+    <div class="pv-card selected" onclick="selectProvider(this,'wa','fonnte')">
+      <div class="pv-head"><div class="pv-logo" style="background:rgba(37,211,102,.12)">📱</div><div><div class="pv-name">Fonnte</div><div class="pv-url">fonnte.com</div></div><span class="badge b-ok" style="margin-left:auto">Terpilih</span></div>
+      <div class="pv-desc">API WA paling populer di Indonesia. Mudah setup, dokumentasi lengkap Bahasa Indonesia.</div>
+      <div class="pv-tags"><span class="pv-tag" style="background:rgba(16,185,129,.1);color:var(--green)">Gratis 1000/bln</span><span class="pv-tag" style="background:rgba(0,212,255,.1);color:var(--cyan)">Mudah</span></div>
+    </div>
+    <div class="pv-card" onclick="selectProvider(this,'wa','wablas')">
+      <div class="pv-head"><div class="pv-logo" style="background:rgba(37,211,102,.12)">💬</div><div><div class="pv-name">WAblaS</div><div class="pv-url">wablas.com</div></div></div>
+      <div class="pv-desc">Provider WA lokal Indonesia dengan fitur broadcast massal dan laporan lengkap.</div>
+      <div class="pv-tags"><span class="pv-tag" style="background:rgba(245,158,11,.1);color:var(--gold)">Rp 99rb/bln</span><span class="pv-tag" style="background:rgba(0,212,255,.1);color:var(--cyan)">Broadcast</span></div>
+    </div>
+    <div class="pv-card" onclick="selectProvider(this,'wa','zenziva')">
+      <div class="pv-head"><div class="pv-logo" style="background:rgba(37,211,102,.1)">📨</div><div><div class="pv-name">Zenziva</div><div class="pv-url">zenziva.net</div></div></div>
+      <div class="pv-desc">WA + SMS gateway. Cocok jika butuh backup SMS jika WA gagal kirim.</div>
+      <div class="pv-tags"><span class="pv-tag" style="background:rgba(245,158,11,.1);color:var(--gold)">Pay as you go</span><span class="pv-tag" style="background:rgba(59,130,246,.1);color:#60a5fa">WA + SMS</span></div>
+    </div>
+  </div>
+
+  <div style="font-size:.85rem;font-weight:800;margin-bottom:12px;margin-top:8px">📧 Email Provider</div>
+  <div class="provider-grid">
+    <div class="pv-card selected" onclick="selectProvider(this,'email','gmail')">
+      <div class="pv-head"><div class="pv-logo" style="background:rgba(234,67,53,.1)">📩</div><div><div class="pv-name">Gmail SMTP</div><div class="pv-url">smtp.gmail.com</div></div><span class="badge b-ok" style="margin-left:auto">Terpilih</span></div>
+      <div class="pv-desc">Gratis, mudah setup. Gunakan App Password Gmail. Cocok untuk skala kecil-menengah.</div>
+      <div class="pv-tags"><span class="pv-tag" style="background:rgba(16,185,129,.1);color:var(--green)">Gratis</span><span class="pv-tag" style="background:rgba(0,212,255,.1);color:var(--cyan)">500/hari</span></div>
+    </div>
+    <div class="pv-card" onclick="selectProvider(this,'email','sendgrid')">
+      <div class="pv-head"><div class="pv-logo" style="background:rgba(22,158,228,.1)">📧</div><div><div class="pv-name">SendGrid</div><div class="pv-url">sendgrid.com</div></div></div>
+      <div class="pv-desc">Platform email marketing profesional. Analytics lengkap, deliverability tinggi.</div>
+      <div class="pv-tags"><span class="pv-tag" style="background:rgba(16,185,129,.1);color:var(--green)">Gratis 100/hari</span><span class="pv-tag" style="background:rgba(0,212,255,.1);color:var(--cyan)">Analytics</span></div>
+    </div>
+    <div class="pv-card" onclick="selectProvider(this,'email','brevo')">
+      <div class="pv-head"><div class="pv-logo" style="background:rgba(0,180,120,.1)">💌</div><div><div class="pv-name">Brevo (Sendinblue)</div><div class="pv-url">brevo.com</div></div></div>
+      <div class="pv-desc">Email + SMS + WA dalam satu platform. Cocok untuk scaling bisnis.</div>
+      <div class="pv-tags"><span class="pv-tag" style="background:rgba(16,185,129,.1);color:var(--green)">Gratis 300/hari</span><span class="pv-tag" style="background:rgba(124,58,237,.1);color:#a78bfa">All-in-one</span></div>
+    </div>
+  </div>
+
+  <!-- CONFIG FORM -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">🔑 Konfigurasi Aktif</div><button class="btn btn-primary" onclick="saveConfig()">💾 Simpan & Test</button></div>
+    <div class="card-body">
+      <div class="cfg-row">
+        <div class="fl"><label>Fonnte Token</label><input type="password" placeholder="Token dari dashboard fonnte.com" value="••••••••••••••••"></div>
+        <div class="fl"><label>Nomor WA Bot</label><input placeholder="+62 812 XXXX XXXX" value="+62 812-3456-7890"></div>
+      </div>
+      <div class="cfg-row">
+        <div class="fl"><label>Gmail / Email SMTP</label><input placeholder="noreply@toko.com" value="noreply@daffastore.com"></div>
+        <div class="fl"><label>Gmail App Password</label><input type="password" placeholder="xxxx xxxx xxxx xxxx" value="••••••••••••••••"></div>
+      </div>
+      <div class="cfg-row">
+        <div class="fl"><label>Nama Pengirim Email</label><input value="DaffaStore"></div>
+        <div class="fl"><label>Mode</label>
+          <select><option>Sandbox (Testing)</option><option>Production (Live)</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST PANEL -->
+  <div class="test-panel">
+    <div class="test-title">🧪 Test Pengiriman</div>
+    <div class="send-sim">
+      <div class="ss-icon">💬</div>
+      <div class="ss-info"><div class="ss-title">Test WhatsApp</div><div class="ss-sub">Kirim pesan test ke nomor kamu</div></div>
+      <input id="testPhone" placeholder="08xxxxxxxxxx" style="background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:7px 12px;color:var(--t1);font-size:.78rem;outline:none;width:160px">
+      <button class="ss-btn" style="background:rgba(37,211,102,.12);color:var(--wa);border:1px solid rgba(37,211,102,.2)" onclick="sendTestWA()">Kirim WA</button>
+    </div>
+    <div class="send-sim">
+      <div class="ss-icon">📧</div>
+      <div class="ss-info"><div class="ss-title">Test Email</div><div class="ss-sub">Kirim email test ke inbox kamu</div></div>
+      <input id="testEmail" placeholder="email@kamu.com" style="background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:7px 12px;color:var(--t1);font-size:.78rem;outline:none;width:160px">
+      <button class="ss-btn" style="background:rgba(234,67,53,.1);color:var(--email);border:1px solid rgba(234,67,53,.2)" onclick="sendTestEmail()">Kirim Email</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ── DATA ──────────────────────────────────────
+const WA_TEMPLATES = {
+  success: {name:'Top Up Sukses', body:`✅ *TOP UP BERHASIL!*
+━━━━━━━━━━━━━━━━
+
+Halo *{nama}*! 🎮
+
+Top up kamu telah *berhasil diproses* dan item sudah masuk ke akunmu!
+
+📋 *Detail Transaksi:*
+• Game     : {game}
+• Item     : {item}
+• User ID  : 12345678
+• Total    : {harga}
+• Order ID : {orderId}
+• Waktu    : {waktu}
+
+💎 Kamu mendapat *+{poin} Poin* reward!
+
+Terima kasih sudah top up di *DaffaStore* 🙏
+Bagikan kode referralmu: *DAFFA2025*
+
+_CS: wa.me/6281234567890_`},
+  pending:{name:'Menunggu Pembayaran',body:`⏳ *SELESAIKAN PEMBAYARANMU*
+━━━━━━━━━━━━━━━━
+
+Halo *{nama}*!
+
+Order kamu *belum dibayar*. Segera selesaikan sebelum kedaluwarsa ya!
+
+🛒 *Order:* {item} ({game})
+💳 *Total:* {harga}
+⏰ *Kedaluwarsa:* 30 menit lagi
+
+➡️ Lanjutkan bayar:
+https://daffastore.com/pay/{orderId}
+
+_Butuh bantuan? Hubungi CS kami 24/7_`},
+  failed: {name:'Top Up Gagal', body:`❌ *MAAF, TOP UP GAGAL*
+━━━━━━━━━━━━━━━━
+
+Halo *{nama}*,
+
+Sayangnya top up kamu *gagal diproses* karena kendala teknis dari supplier.
+
+📋 *Order ID:* {orderId}
+💳 *Total:* {harga}
+
+✅ *Jangan khawatir!* Uangmu 100% aman.
+Refund akan diproses dalam *1x24 jam*.
+
+Hubungi CS kami:
+📱 wa.me/6281234567890
+
+_Mohon maaf atas ketidaknyamanannya_ 🙏`},
+  promo:  {name:'Blast Promo', body:`🎉 *PROMO SPESIAL HARI INI!*
+━━━━━━━━━━━━━━━━
+
+Halo *{nama}*! 👋
+
+Ada promo spesial yang sayang kamu lewatkan!
+
+🔥 *DISKON 20%* untuk semua top up hari ini!
+🎯 Gunakan kode: *DAFFA20*
+⏳ Berlaku sampai: Tengah malam ini
+
+Langsung top up sekarang:
+👉 https://daffastore.com
+
+_Promo terbatas, jangan sampai kehabisan!_ 🚀`},
+  referral:{name:'Komisi Referral', body:`💰 *KOMISI REFERRAL MASUK!*
+━━━━━━━━━━━━━━━━
+
+Halo *{nama}*! 🎉
+
+*Rizky Ardiansyah* baru saja top up menggunakan kode referralmu!
+
+💵 *Komisi kamu:* Rp 5.550
+💎 *Total komisi:* Rp 87.250
+
+Saldo komisimu bisa dicairkan kapan saja.
+_Terus ajak teman dan raih lebih banyak!_ 🚀
+
+👉 https://daffastore.com/referral`}
+};
+
+const EMAIL_TEMPLATES = {
+  success: `<div style="font-family:'Segoe UI',sans-serif;max-width:580px;margin:0 auto;background:#f4f6fb;padding:20px">
+  <div style="background:linear-gradient(135deg,#10b981,#059669);padding:36px;text-align:center;border-radius:16px 16px 0 0">
+    <div style="font-size:3.5rem;margin-bottom:12px">🎉</div>
+    <h1 style="color:#fff;margin:0;font-size:1.7rem;font-weight:900">Top Up Berhasil!</h1>
+    <p style="color:rgba(255,255,255,.85);margin:8px 0 0;font-size:.9rem">Item kamu sudah masuk ke akun game</p>
+  </div>
+  <div style="background:#fff;padding:32px;border-radius:0 0 16px 16px;box-shadow:0 4px 20px rgba(0,0,0,.08)">
+    <p style="font-size:.95rem;color:#374151;margin-bottom:20px">Halo <b>Daffa Putra</b>,<br>Top up kamu telah <b style="color:#10b981">berhasil diproses</b> secara otomatis!</p>
+    <div style="background:#f9fafb;border-radius:12px;overflow:hidden;margin-bottom:20px;border:1px solid #e5e7eb">
+      <div style="background:#7c3aed;padding:12px 16px;color:#fff;font-size:.8rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Detail Transaksi</div>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:11px 16px;font-size:.85rem;color:#6b7280;border-bottom:1px solid #f0f0f0">Game</td><td style="padding:11px 16px;font-size:.85rem;font-weight:700;color:#111;border-bottom:1px solid #f0f0f0">⚔️ Mobile Legends</td></tr>
+        <tr style="background:#fafafa"><td style="padding:11px 16px;font-size:.85rem;color:#6b7280;border-bottom:1px solid #f0f0f0">Item</td><td style="padding:11px 16px;font-size:.85rem;font-weight:700;color:#111;border-bottom:1px solid #f0f0f0">514 Diamond</td></tr>
+        <tr><td style="padding:11px 16px;font-size:.85rem;color:#6b7280;border-bottom:1px solid #f0f0f0">User ID</td><td style="padding:11px 16px;font-size:.85rem;font-weight:700;color:#111;border-bottom:1px solid #f0f0f0">12345678 (Server 1234)</td></tr>
+        <tr style="background:#fafafa"><td style="padding:11px 16px;font-size:.85rem;color:#6b7280;border-bottom:1px solid #f0f0f0">Pembayaran</td><td style="padding:11px 16px;font-size:.85rem;font-weight:700;color:#111;border-bottom:1px solid #f0f0f0">QRIS</td></tr>
+        <tr><td style="padding:11px 16px;font-size:.85rem;color:#6b7280;border-bottom:1px solid #f0f0f0">Total</td><td style="padding:11px 16px;font-size:1rem;font-weight:900;color:#7c3aed;border-bottom:1px solid #f0f0f0">Rp 111.000</td></tr>
+        <tr style="background:#fafafa"><td style="padding:11px 16px;font-size:.85rem;color:#6b7280">Order ID</td><td style="padding:11px 16px;font-size:.82rem;font-family:monospace;color:#374151">DS-ABC123-DEFG</td></tr>
+      </table>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(0,212,255,.04));border:1px solid rgba(124,58,237,.15);border-radius:12px;padding:16px;margin-bottom:20px;text-align:center">
+      <div style="font-size:.8rem;color:#6b7280;margin-bottom:4px">Poin Reward Didapat</div>
+      <div style="font-size:1.5rem;font-weight:900;color:#7c3aed">+111 Poin 💎</div>
+      <div style="font-size:.75rem;color:#9ca3af;margin-top:4px">Total poin kamu: 1.361 Poin</div>
+    </div>
+    <div style="text-align:center;margin-bottom:20px">
+      <a href="#" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.9rem">Cek Riwayat Order →</a>
+    </div>
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
+    <p style="font-size:.78rem;color:#9ca3af;text-align:center;line-height:1.6">Punya pertanyaan? Hubungi CS kami via <a href="#" style="color:#7c3aed">WhatsApp</a> atau <a href="#" style="color:#7c3aed">Live Chat</a>.<br>© 2025 DaffaStore — Platform Top Up Game Terpercaya</p>
+  </div></div>`,
+  pending:`<div style="font-family:'Segoe UI',sans-serif;max-width:580px;margin:0 auto;background:#f4f6fb;padding:20px">
+  <div style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:36px;text-align:center;border-radius:16px 16px 0 0">
+    <div style="font-size:3.5rem;margin-bottom:12px">⏳</div>
+    <h1 style="color:#fff;margin:0;font-size:1.7rem;font-weight:900">Selesaikan Pembayaran</h1>
+    <p style="color:rgba(255,255,255,.85);margin:8px 0 0;font-size:.9rem">Order kamu menunggu konfirmasi pembayaran</p>
+  </div>
+  <div style="background:#fff;padding:32px;border-radius:0 0 16px 16px">
+    <p style="font-size:.95rem;color:#374151;margin-bottom:16px">Halo <b>Daffa Putra</b>, order kamu sudah dibuat! Selesaikan pembayaran sebelum kedaluwarsa.</p>
+    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:16px;margin-bottom:20px;text-align:center">
+      <div style="font-size:.8rem;color:#92400e">Kedaluwarsa dalam</div>
+      <div style="font-size:2rem;font-weight:900;color:#d97706">29:47</div>
+    </div>
+    <div style="background:#f9fafb;border-radius:12px;padding:16px;border:1px solid #e5e7eb;margin-bottom:20px">
+      <div style="font-size:.85rem;font-weight:700;margin-bottom:12px">📋 Ringkasan Order</div>
+      <div style="display:flex;justify-content:space-between;font-size:.85rem;padding:6px 0;border-bottom:1px solid #f0f0f0"><span style="color:#6b7280">Game</span><span style="font-weight:700">Mobile Legends · 514 Diamond</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:.95rem;padding:10px 0;font-weight:900"><span>Total Bayar</span><span style="color:#f59e0b">Rp 111.000</span></div>
+    </div>
+    <div style="text-align:center">
+      <a href="#" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.95rem">Bayar Sekarang →</a>
+    </div>
+  </div></div>`,
+  failed:`<div style="font-family:'Segoe UI',sans-serif;max-width:580px;margin:0 auto;background:#f4f6fb;padding:20px">
+  <div style="background:linear-gradient(135deg,#ef4444,#dc2626);padding:36px;text-align:center;border-radius:16px 16px 0 0">
+    <div style="font-size:3.5rem;margin-bottom:12px">❌</div>
+    <h1 style="color:#fff;margin:0;font-size:1.7rem;font-weight:900">Top Up Gagal</h1>
+    <p style="color:rgba(255,255,255,.85);margin:8px 0 0;font-size:.9rem">Terjadi kendala dalam memproses top up kamu</p>
+  </div>
+  <div style="background:#fff;padding:32px;border-radius:0 0 16px 16px">
+    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;color:#dc2626;margin-bottom:6px">⚠️ Mengapa ini terjadi?</div>
+      <div style="font-size:.82rem;color:#7f1d1d;line-height:1.6">Server supplier sedang mengalami gangguan sementara. Tim kami sudah mengetahui masalah ini dan sedang diperbaiki.</div>
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;color:#166534;margin-bottom:6px">✅ Uangmu 100% Aman</div>
+      <div style="font-size:.82rem;color:#14532d;line-height:1.6">Refund penuh akan dikembalikan ke metode pembayaran asalmu dalam <b>1x24 jam</b> kerja.</div>
+    </div>
+    <div style="text-align:center">
+      <a href="#" style="display:inline-block;background:#374151;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.85rem">Hubungi CS via WhatsApp →</a>
+    </div>
+  </div></div>`,
+  welcome:`<div style="font-family:'Segoe UI',sans-serif;max-width:580px;margin:0 auto;background:#f4f6fb;padding:20px">
+  <div style="background:linear-gradient(135deg,#7c3aed,#00d4ff);padding:36px;text-align:center;border-radius:16px 16px 0 0">
+    <div style="font-size:3.5rem;margin-bottom:12px">👋</div>
+    <h1 style="color:#fff;margin:0;font-size:1.7rem;font-weight:900">Selamat Datang!</h1>
+    <p style="color:rgba(255,255,255,.85);margin:8px 0 0">Akun DaffaStore kamu sudah siap</p>
+  </div>
+  <div style="background:#fff;padding:32px;border-radius:0 0 16px 16px">
+    <p style="font-size:.95rem;color:#374151;margin-bottom:20px">Halo <b>Daffa Putra</b>! 🎮<br>Selamat bergabung di <b>DaffaStore</b> — platform top up game terpercaya Indonesia!</p>
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(0,212,255,.04));border:1px solid rgba(124,58,237,.15);border-radius:12px;padding:20px;margin-bottom:20px;text-align:center">
+      <div style="font-size:.85rem;color:#6b7280;margin-bottom:6px">🎁 Bonus Selamat Datang</div>
+      <div style="font-size:2.2rem;font-weight:900;color:#7c3aed">500 Poin</div>
+      <div style="font-size:.78rem;color:#9ca3af;margin-top:4px">Sudah ditambahkan ke akunmu · Senilai Rp 5.000 diskon</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px">
+      <div style="text-align:center;padding:12px;background:#f9fafb;border-radius:10px"><div style="font-size:1.3rem;margin-bottom:4px">⚡</div><div style="font-size:.72rem;color:#374151;font-weight:600">Proses Instan</div></div>
+      <div style="text-align:center;padding:12px;background:#f9fafb;border-radius:10px"><div style="font-size:1.3rem;margin-bottom:4px">💰</div><div style="font-size:.72rem;color:#374151;font-weight:600">Harga Termurah</div></div>
+      <div style="text-align:center;padding:12px;background:#f9fafb;border-radius:10px"><div style="font-size:1.3rem;margin-bottom:4px">🎁</div><div style="font-size:.72rem;color:#374151;font-weight:600">Poin Reward</div></div>
+    </div>
+    <div style="text-align:center">
+      <a href="#" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.95rem">🎮 Mulai Top Up Sekarang →</a>
+    </div>
+  </div></div>`
+};
+
+// ── INIT ──────────────────────────────────────
+const LOG_DATA = [];
+const phones = ['081234567890','082345678901','083456789012','085678901234'];
+const names  = ['Daffa Putra','Rizky A','Ayu W','Bima S','Sari D','Kevin P'];
+const tmpls  = ['Top Up Sukses','Pending Order','Top Up Gagal','Blast Promo','Komisi Referral'];
+const channels = ['WA','WA','WA','Email','Email'];
+
+for (let i = 0; i < 60; i++) {
+  const d = new Date(Date.now() - Math.random() * 24 * 3600000);
+  const ch = channels[Math.floor(Math.random() * channels.length)];
+  LOG_DATA.push({
+    time:    d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    orderId: 'DS-' + Math.random().toString(36).slice(2,8).toUpperCase(),
+    channel: ch,
+    dest:    ch === 'WA' ? phones[Math.floor(Math.random()*phones.length)] : names[Math.floor(Math.random()*names.length)]+'@gmail.com',
+    tmpl:    tmpls[Math.floor(Math.random()*tmpls.length)],
+    latency: (0.5 + Math.random()*6).toFixed(1) + 's',
+    status:  Math.random() > 0.04 ? 'OK' : 'GAGAL'
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderRecentLog();
+  renderLogTable(LOG_DATA);
+  selectWATmpl('success', document.querySelector('#waTmplSelector .tmpl-card'));
+  selectEmailTmpl('success', document.querySelector('#emailTmplSel .tmpl-card'));
+});
+
+// ── PAGES ─────────────────────────────────────
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.tn').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else document.querySelectorAll('.tn').forEach((t, i) => {
+    const map = {overview:0,wa:1,email:2,code:3,log:4,settings:5};
+    if (i === (map[id] ?? 0)) t.classList.add('active');
+  });
+}
+
+// ── WA TEMPLATES ──────────────────────────────
+function selectWATmpl(key, el) {
+  document.querySelectorAll('#waTmplSelector .tmpl-card').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const tmpl = WA_TEMPLATES[key];
+  document.getElementById('waTmplName').value = tmpl.name;
+  document.getElementById('waTmplBody').value = tmpl.body;
+  renderPhonePreview(tmpl.body);
+}
+
+function renderPhonePreview(text) {
+  const body = document.getElementById('phoneBody');
+  const sample = text
+    .replace(/{nama}/g,'Daffa Putra')
+    .replace(/{game}/g,'Mobile Legends')
+    .replace(/{item}/g,'514 Diamond')
+    .replace(/{orderId}/g,'DS-ABC123')
+    .replace(/{harga}/g,'Rp 111.000')
+    .replace(/{waktu}/g,'20 Mei 2025, 14:32')
+    .replace(/{poin}/g,'111');
+
+  const lines = sample.split('\n');
+  let html = '';
+  lines.forEach(line => {
+    if (!line.trim()) { html += `<div style="height:4px"></div>`; return; }
+    const formatted = line
+      .replace(/\*(.*?)\*/g,'<span class="wa-bold">$1</span>')
+      .replace(/_(.*?)_/g,'<i>$1</i>');
+    html += `<span style="display:block;font-size:.73rem;line-height:1.5;color:#111">${formatted}</span>`;
+  });
+
+  body.innerHTML = `<div class="wa-msg recv">${html}<div class="wa-time">14:32 ✓✓</div></div>`;
+}
+
+function saveTmpl() {
+  const name = document.getElementById('waTmplName').value;
+  toast(`Template "${name}" berhasil disimpan ✅`, 'ok');
+}
+
+function resetTmpl() {
+  selectWATmpl('success', document.querySelector('#waTmplSelector .tmpl-card'));
+  toast('Template direset ke default', 'info');
+}
+
+// ── EMAIL TEMPLATES ───────────────────────────
+function selectEmailTmpl(key, el) {
+  document.querySelectorAll('#emailTmplSel .tmpl-card').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('emailPreview').innerHTML = EMAIL_TEMPLATES[key] || '<p style="padding:20px;color:#666">Template tidak tersedia</p>';
+}
+
+// ── LOG ───────────────────────────────────────
+let logFilter = 'all';
+let logPage   = 1;
+const LOG_PG  = 15;
+
+function renderLogTable(data) {
+  const filtered = data.filter(l => logFilter === 'all' || l.channel === logFilter || l.status === logFilter);
+  const total = filtered.length;
+  const slice = filtered.slice((logPage-1)*LOG_PG, logPage*LOG_PG);
+  document.getElementById('logCount').textContent = `Menampilkan ${Math.min((logPage-1)*LOG_PG+1,total)}–${Math.min(logPage*LOG_PG,total)} dari ${total} log`;
+  document.getElementById('logTable').innerHTML = slice.map(l => `
+    <tr>
+      <td style="font-family:monospace;font-size:.72rem;color:var(--t3)">${l.time}</td>
+      <td style="font-family:monospace;font-size:.72rem;color:var(--cyan)">${l.orderId}</td>
+      <td><span class="badge ${l.channel==='WA'?'b-wa':'b-em'}">${l.channel==='WA'?'💬':'📧'} ${l.channel}</span></td>
+      <td style="font-size:.75rem;color:var(--t2)">${l.dest}</td>
+      <td style="font-size:.75rem">${l.tmpl}</td>
+      <td style="font-size:.75rem;color:var(--t2)">${l.latency}</td>
+      <td><span class="badge ${l.status==='OK'?'b-ok':'b-fail'}">${l.status==='OK'?'✓ Terkirim':'✗ Gagal'}</span></td>
+      <td><button style="background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t2);padding:4px 9px;font-size:.68rem;cursor:pointer" onclick="toast('Detail log: '+JSON.stringify(${JSON.stringify(l)}),'info')">Detail</button></td>
+    </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--t3)">Tidak ada log</td></tr>`;
+
+  const pg = document.getElementById('logPg');
+  pg.innerHTML = '';
+  for (let i = 1; i <= Math.min(Math.ceil(total/LOG_PG), 5); i++) {
+    const b = document.createElement('button');
+    b.style.cssText = `padding:4px 10px;border-radius:6px;font-size:.72rem;cursor:pointer;border:1px solid ${i===logPage?'var(--cyan)':'var(--b2)'};background:${i===logPage?'rgba(0,212,255,.1)':'var(--s3)'};color:${i===logPage?'var(--cyan)':'var(--t2)'}`;
+    b.textContent = i;
+    b.onclick = () => { logPage = i; renderLogTable(LOG_DATA); };
+    pg.appendChild(b);
+  }
+}
+
+function filterLog(val) { logFilter = val; logPage = 1; renderLogTable(LOG_DATA); }
+function refreshLog() { renderLogTable(LOG_DATA); toast('Log diperbarui','info'); }
+function exportLog() {
+  const csv = ['Waktu,OrderID,Channel,Tujuan,Template,Latency,Status', ...LOG_DATA.map(l => `${l.time},${l.orderId},${l.channel},${l.dest},${l.tmpl},${l.latency},${l.status}`)].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'notif-log.csv';
+  a.click();
+  toast('Log berhasil diexport ⬇️', 'ok');
+}
+
+function renderRecentLog() {
+  document.getElementById('recentLog').innerHTML = LOG_DATA.slice(0,8).map(l => `
+    <tr>
+      <td style="font-family:monospace;font-size:.72rem;color:var(--t3)">${l.time}</td>
+      <td style="font-family:monospace;font-size:.72rem;color:var(--cyan)">${l.orderId}</td>
+      <td><span class="badge ${l.channel==='WA'?'b-wa':'b-em'}">${l.channel}</span></td>
+      <td style="font-size:.75rem;color:var(--t2)">${l.dest}</td>
+      <td style="font-size:.75rem">${l.tmpl}</td>
+      <td><span class="badge ${l.status==='OK'?'b-ok':'b-fail'}">${l.status==='OK'?'✓':'✗'} ${l.status}</span></td>
+    </tr>`).join('');
+}
+
+// ── ACTIONS ───────────────────────────────────
+function sendTestWA() {
+  const phone = document.getElementById('testPhone')?.value || '081234567890';
+  setTimeout(() => {
+    toast(`✅ WA test berhasil dikirim ke ${phone}`, 'wa');
+    addLog('WA', phone, 'Test Template');
+  }, 1200);
+  toast('⏳ Mengirim WA...', 'info');
+}
+
+function sendTestEmail() {
+  const email = document.getElementById('testEmail')?.value || 'test@email.com';
+  setTimeout(() => {
+    toast(`📧 Email test berhasil dikirim ke ${email}`, 'ok');
+    addLog('Email', email, 'Test Template');
+  }, 1500);
+  toast('⏳ Mengirim email...', 'info');
+}
+
+function sendTestAll() {
+  toast('⏳ Mengirim semua test notifikasi...', 'info');
+  setTimeout(() => toast('✅ WA test terkirim!', 'wa'), 1000);
+  setTimeout(() => toast('📧 Email test terkirim!', 'ok'), 1800);
+  setTimeout(() => toast('🎉 Semua notifikasi test berhasil!', 'ok'), 2500);
+}
+
+function addLog(ch, dest, tmpl) {
+  LOG_DATA.unshift({
+    time: new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    orderId: 'DS-TEST-' + Math.random().toString(36).slice(2,6).toUpperCase(),
+    channel: ch, dest, tmpl,
+    latency: (0.8+Math.random()*2).toFixed(1)+'s', status:'OK'
+  });
+  renderRecentLog();
+}
+
+function selectProvider(el, type, name) {
+  el.closest('.provider-grid').querySelectorAll('.pv-card').forEach(c => {
+    c.classList.remove('selected');
+    c.querySelector('.badge')?.remove();
+  });
+  el.classList.add('selected');
+  const b = document.createElement('span');
+  b.className = 'badge b-ok';
+  b.style.cssText = 'margin-left:auto';
+  b.textContent = 'Terpilih';
+  el.querySelector('.pv-head').appendChild(b);
+  toast(`Provider "${name}" dipilih`, 'info');
+}
+
+function saveConfig() {
+  toast('Konfigurasi disimpan & test connection berhasil ✅', 'ok');
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.trim()).catch(() => {});
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+
+function toast(msg, type = 'info') {
+  const w = document.getElementById('toastW');
+  const d = document.createElement('div');
+  d.className = `toast ${type}`;
+  d.textContent = msg;
+  w.appendChild(d);
+  setTimeout(() => d.style.opacity='0', 2700);
+  setTimeout(() => d.remove(), 3000);
+}
+</script>
+</body>
+</html>
